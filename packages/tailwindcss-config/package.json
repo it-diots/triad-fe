@@ -1,0 +1,9 @@
+{
+  "name": "@triad/tailwindcss-config",
+  "version": "0.0.1",
+  "private": true,
+  "main": "tailwind.config.ts",
+  "devDependencies": {
+    "@triad/typescript-config": "workspace:*"
+  }
+}

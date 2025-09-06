@@ -1,0 +1,22 @@
+{
+  "name": "@triad/web",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "15.0.3",
+    "@triad/ui": "workspace:*"
+  },
+  "devDependencies": {
+    "@triad/eslint-config": "workspace:*",
+    "@triad/typescript-config": "workspace:*",
+    "@triad/tailwindcss-config": "workspace:*",
+    "eslint-config-next": "15.0.3"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "name": "triad-fe",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "build": "turbo run build",
+    "build:web": "turbo run build --filter @triad/web",
+    "dev": "turbo run dev",
+    "dev:web": "turbo run dev --filter @triad/web",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "type-check": "turbo run type-check"
+  },
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^19.1.5",
+    "@types/react-dom": "^19.1.5",
+    "autoprefixer": "^10.4.21",
+    "deepmerge": "^4.3.1",
+    "eslint": "^8.0.0",
+    "glob": "^11.0.3",
+    "postcss": "^8.5.6",
+    "prettier": "^3.6.2",
+    "prettier-plugin-tailwindcss": "^0.6.14",
+    "tailwindcss": "3.4.17",
+    "tsx": "^4.20.5",
+    "turbo": "^2.0.0",
+    "typescript": "^5.5.3"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}

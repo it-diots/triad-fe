@@ -1,0 +1,7 @@
+{
+  "extends": "@triad/typescript-config/base",
+  "compilerOptions": {
+    "baseUrl": "."
+  },
+  "include": ["tailwind.config.ts"]
+}
