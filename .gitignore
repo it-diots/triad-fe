@@ -55,3 +55,5 @@ logs
 *.crx
 *.pem
 web-ext-artifacts/
+
+.claude
