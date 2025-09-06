@@ -99,25 +99,6 @@ triad-fe/
 └── rules/                   # 프로젝트 개발 규칙
 ```
 
-## 개발 가이드라인
+## 최근 변경사항
 
-### 코드 표준
-
-- 함수형 및 선언형 프로그래밍 패턴 사용
-- `type`보다 `interface` 선호
-- `enum` 사용 금지, 대신 const 맵 사용
-- 'use client' 지시어 사용 최소화
-- 가능한 경우 React Server Components 선호
-
-### 이름 규칙
-
-- 보조 동사를 사용하여 서술적인 이름 사용 (isLoading, hasError)
-- 이벤트 핸들러 앞에는 "handle" 접두사 사용 (handleClick, handleSubmit)
-- 디렉토리 이름은 소문자와 대시 사용 (auth-wizard)
-- 컴포넌트는 named export 사용
-
-### Git 커밋 규칙
-
-- 형식: `type: subject` (소문자, 마침표 없음)
-- 타입: feat, del, fix, build, ci, docs, style, refactor, test, chore, revert
-- 제목 최대 50자, 본문 한 줄당 최대 72자
+현재 Chrome 확장 프로그램에서 웹페이지 구조로 전환 중입니다.
