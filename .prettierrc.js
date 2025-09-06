@@ -1,1 +1,1 @@
-module.exports = require('@triad/eslint-config/prettier');
+module.exports = require("@triad/eslint-config/prettier");

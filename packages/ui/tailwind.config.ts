@@ -1,7 +1,7 @@
-import config from '@triad/tailwindcss-config';
+import config from "@triad/tailwindcss-config";
 
 /** @type {import('tailwindcss').Config} */
 export default {
   ...config,
-  content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
+  content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
 };
