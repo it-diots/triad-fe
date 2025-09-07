@@ -1,6 +1,14 @@
 import "@triad/ui/globals.css";
 
 import type { Metadata } from "next";
+import localFont from "next/font/local";
+
+const pretendard = localFont({
+  src: "../public/fonts/PretendardVariable.woff2",
+  display: "swap",
+  weight: "400 900",
+  variable: "--font-pretendard",
+});
 
 export const metadata: Metadata = {
   title: "Triad Web App",
@@ -13,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko">
+    <html lang="ko" className={`${pretendard.variable}`}>
       <body className="antialiased">{children}</body>
     </html>
   );
