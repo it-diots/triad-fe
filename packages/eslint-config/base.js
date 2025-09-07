@@ -1,27 +1,23 @@
-const { resolve } = require('node:path');
-
-const project = resolve(process.cwd(), 'tsconfig.json');
-
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
-  parser: '@typescript-eslint/parser',
+  parser: "@typescript-eslint/parser",
   parserOptions: {
-    project,
+    project: true,
   },
-  plugins: ['@typescript-eslint'],
+  plugins: ["@typescript-eslint"],
   rules: {
-    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
   },
   ignorePatterns: [
-    '**/*.config.js',
-    '**/*.config.ts',
-    '**/*.config.cjs',
-    '**/.eslintrc.cjs',
-    '**/tailwind.config.*',
-    '**/next.config.*',
-    '**/vite.config.*',
-    '.next',
-    'dist',
-    'pnpm-lock.yaml',
+    "**/*.config.js",
+    "**/*.config.ts",
+    "**/*.config.cjs",
+    "**/.eslintrc.cjs",
+    "**/tailwind.config.*",
+    "**/next.config.*",
+    "**/vite.config.*",
+    ".next",
+    "dist",
+    "pnpm-lock.yaml",
   ],
 };
