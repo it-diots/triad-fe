@@ -6,10 +6,11 @@
     "build": "turbo run build",
     "build:web": "turbo run build --filter @triad/web",
     "dev": "turbo run dev",
-    "dev:web": "turbo run dev --filter @triad/web",
+    "dev:web": "turbo run dev --filter @triad/web --filter @triad/ui",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "type-check": "turbo run type-check"
+    "type-check": "turbo run type-check",
+    "ui": "turbo run ui --filter @triad/ui --"
   },
   "dependencies": {
     "react": "^19.1.0",

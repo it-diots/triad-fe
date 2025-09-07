@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "private": true,
   "main": "tailwind.config.ts",
+  "exports": {
+    ".": "./tailwind.config.ts",
+    "./postcss": "./postcss.config.mjs"
+  },
   "devDependencies": {
     "@triad/typescript-config": "workspace:*"
   }

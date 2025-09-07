@@ -6,7 +6,7 @@ export default function Home() {
       <main className="row-start-2 flex flex-col items-center gap-8 sm:items-start">
         <h1 className="text-4xl font-bold">Welcome to Triad</h1>
         <p className="text-lg">Your Next.js 15 app is running!</p>
-        <Button>asd</Button>
+        <Button variant="destructive">asd</Button>
       </main>
     </div>
   );

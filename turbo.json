@@ -12,9 +12,16 @@
     "type-check": {
       "dependsOn": ["^type-check"]
     },
+    "setup-dev": {
+      "dependsOn": ["^setup-dev"]
+    },
     "dev": {
+      "dependsOn": ["^setup-dev"],
       "cache": false,
       "persistent": true
+    },
+    "ui": {
+      "cache": false
     }
   }
 }
