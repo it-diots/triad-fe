@@ -1,7 +1,7 @@
 {
   "name": "triad-fe",
   "private": true,
-  "packageManager": "pnpm@9.0.0",
+  "packageManager": "pnpm@10.15.1",
   "scripts": {
     "build": "turbo run build",
     "build:web": "turbo run build --filter @triad/web",
@@ -13,22 +13,22 @@
     "ui": "turbo run ui --filter @triad/ui --"
   },
   "dependencies": {
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "@types/react": "^19.1.5",
-    "@types/react-dom": "^19.1.5",
+    "@types/node": "^20.19.13",
+    "@types/react": "^19.1.12",
+    "@types/react-dom": "^19.1.9",
     "autoprefixer": "^10.4.21",
     "deepmerge": "^4.3.1",
-    "eslint": "^8.0.0",
+    "eslint": "^8.57.1",
     "glob": "^11.0.3",
     "postcss": "^8.5.6",
     "tailwindcss": "3.4.17",
     "tsx": "^4.20.5",
-    "turbo": "^2.0.0",
-    "typescript": "^5.5.3"
+    "turbo": "^2.5.6",
+    "typescript": "^5.9.2"
   },
   "workspaces": [
     "apps/*",
