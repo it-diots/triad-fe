@@ -1,0 +1,28 @@
+{
+  "name": "@triad/extension",
+  "version": "0.0.1",
+  "description": "Triad Chrome Extension",
+  "type": "module",
+  "scripts": {
+    "dev": "wxt",
+    "dev:firefox": "wxt -b firefox",
+    "build": "wxt build",
+    "build:firefox": "wxt build -b firefox",
+    "zip": "wxt zip",
+    "zip:firefox": "wxt zip -b firefox",
+    "compile": "tsc --noEmit",
+    "postinstall": "wxt prepare"
+  },
+  "dependencies": {
+    "@triad/ui": "workspace:*",
+    "@triad/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@triad/eslint-config": "workspace:*",
+    "@triad/typescript-config": "workspace:*",
+    "@triad/tailwindcss-config": "workspace:*",
+    "@types/chrome": "^0.0.268",
+    "@wxt-dev/module-react": "^1.1.0",
+    "wxt": "^0.20.11"
+  }
+}
