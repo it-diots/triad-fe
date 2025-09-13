@@ -5,8 +5,10 @@
   "scripts": {
     "build": "turbo run build",
     "build:web": "turbo run build --filter @triad/web",
+    "build:ext": "turbo run build --filter @triad/extension",
     "dev": "turbo run dev",
     "dev:web": "turbo run dev --filter @triad/web --filter @triad/ui",
+    "dev:ext": "turbo run dev --filter @triad/extension --filter @triad/ui",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "type-check": "turbo run type-check",

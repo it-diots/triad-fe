@@ -42,6 +42,7 @@ logs
 .parcel-cache/
 .next/
 .nuxt/
+.wxt/
 
 # Temporary files
 *.tmp
