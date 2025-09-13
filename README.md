@@ -42,8 +42,8 @@ TypeScript, Tailwind CSS, Turborepo를 사용하는 React/Next.js 모노레포�
 
 ### 사전 요구사항
 
-- Node.js 20+
-- pnpm 9.0.0+
+- Node.js 23.6.1
+- pnpm 10.15.1
 
 ### 설치
 
@@ -59,6 +59,9 @@ pnpm dev
 
 # 웹 앱만 실행
 pnpm dev:web
+
+# 확장프로그램만 실행
+pnpm dev:extension
 ```
 
 ### 빌드
@@ -69,6 +72,9 @@ pnpm build
 
 # 웹 앱만 빌드
 pnpm build:web
+
+# 확장프로그램만 빌드
+pnpm build:extension
 ```
 
 ### 코드 품질
@@ -89,6 +95,7 @@ pnpm type-check
 ```
 triad-fe/
 ├── apps/
+│   ├── extension/           # WXT 크롬 확장프로그램
 │   └── web/                 # Next.js 15 애플리케이션
 ├── packages/
 │   ├── ui/                  # 공유 React 컴포넌트 라이브러리
@@ -101,4 +108,4 @@ triad-fe/
 
 ## 최근 변경사항
 
-현재 Chrome 확장 프로그램에서 웹페이지 구조로 전환 중입니다.
+WXT 프레임워크를 사용한 Chrome 확장 프로그램 개발 환경이 추가되었습니다. 웹 애플리케이션과 확장 프로그램 모두 지원하는 하이브리드 구조로 발전했습니다.
