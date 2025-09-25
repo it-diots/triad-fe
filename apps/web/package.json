@@ -13,11 +13,15 @@
     "@triad/ui": "workspace:*",
     "motion": "^12.23.22",
     "next": "15.0.3"
+    "bcryptjs": "^3.0.2",
+    "next": "15.0.3",
+    "next-auth": "5.0.0-beta.29"
   },
   "devDependencies": {
     "@triad/eslint-config": "workspace:*",
     "@triad/tailwindcss-config": "workspace:*",
     "@triad/typescript-config": "workspace:*",
+    "@types/bcryptjs": "^3.0.0",
     "eslint-config-next": "15.0.3"
   }
 }

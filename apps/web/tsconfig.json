@@ -5,7 +5,9 @@
     "paths": {
       "@/*": ["./*"]
     },
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "declaration": false,
+    "declarationMap": false
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]

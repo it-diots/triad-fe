@@ -13,5 +13,5 @@
   "tailwindCSS.experimental.classRegex": [
     ["cva(?:<[^>]*>)?(([^)]*))", "[\"'`]([^\"'`]*).*?[\"'`]"]
   ],
-  "cSpell.words": ["pretendard", "Segoe"]
+  "cSpell.words": ["pretendard", "Segoe", "supabase"]
 }
