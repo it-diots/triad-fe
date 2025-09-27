@@ -16,7 +16,7 @@ export default function Header() {
   }, [open]);
 
   // 오버레이 클릭으로 닫기 (사이드바 외부 클릭)
-  const onOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!drawerRef.current) return;
     if (!drawerRef.current.contains(e.target as Node)) {
       setOpen(false);
@@ -62,7 +62,7 @@ export default function Header() {
           aria-label="Open menu"
           aria-expanded={open}
           onClick={() => setOpen(true)}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/10 text-white/90 hover:bg-white/5 active:scale-95"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-md text-white/90 hover:bg-white/5 active:scale-95"
         >
           {/* 햄버거 아이콘 (inline svg) */}
           <svg
@@ -87,7 +87,7 @@ export default function Header() {
         className={`fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
           open ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
-        onClick={onOverlayClick}
+        onClick={handleOverlayClick}
       />
 
       {/* 오른쪽 사이드바 드로어 */}
@@ -107,7 +107,7 @@ export default function Header() {
           <button
             aria-label="Close menu"
             onClick={() => setOpen(false)}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/10 text-white/80 hover:bg-white/5 active:scale-95"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md text-white/80 hover:bg-white/5 active:scale-95"
           >
             {/* 닫기 아이콘 */}
             <svg

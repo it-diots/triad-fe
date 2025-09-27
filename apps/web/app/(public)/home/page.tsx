@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react";
 
-import Header from "./Header";
+import { Header } from "./Header";
 
 const DURATION = 1.2;
 
