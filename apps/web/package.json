@@ -10,13 +10,14 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "next": "15.0.3",
-    "@triad/ui": "workspace:*"
+    "@triad/ui": "workspace:*",
+    "motion": "^12.23.22",
+    "next": "15.0.3"
   },
   "devDependencies": {
     "@triad/eslint-config": "workspace:*",
-    "@triad/typescript-config": "workspace:*",
     "@triad/tailwindcss-config": "workspace:*",
+    "@triad/typescript-config": "workspace:*",
     "eslint-config-next": "15.0.3"
   }
 }
