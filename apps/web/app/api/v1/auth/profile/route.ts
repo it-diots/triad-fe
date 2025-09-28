@@ -1,19 +1,20 @@
 import { GetUserProfileResponseSchema } from "@/schemas/users";
-import { API_ENDPOINTS, apiClient } from "@/utils/api-client";
-import { setServerToken } from "@/utils/api-client/auth-adapter";
+import { API_ENDPOINTS } from "@/utils/api-client";
 import {
   ApiResponseHandler,
   ErrorHandlers,
   withErrorHandler,
 } from "@/utils/api-error-handler";
+import { createServerApiWithAuth } from "@/utils/server-api";
 
 /**
  * 현재 로그인한 사용자 프로필 조회 API 엔드포인트
  * 외부 API 서버와 통신하여 인증된 사용자의 프로필 정보를 가져옵니다.
  */
-const getProfileHandler = async (request: Request): Promise<Response> => {
-  const authHeader = request.headers.get("authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+const getProfileHandler = async (): Promise<Response> => {
+  const { apiClient, isAuthenticated } = await createServerApiWithAuth();
+
+  if (!isAuthenticated) {
     throw {
       status: 401,
       data: {
@@ -23,12 +24,7 @@ const getProfileHandler = async (request: Request): Promise<Response> => {
     };
   }
 
-  const token = authHeader.substring(7);
-
-  // 서버 환경에서 토큰 설정
-  setServerToken(token);
   const response = await apiClient.get(API_ENDPOINTS.AUTH.PROFILE);
-
   const responseData = await response.json();
   const validatedResponse = GetUserProfileResponseSchema.parse(responseData);
 
