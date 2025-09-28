@@ -11,11 +11,9 @@
   },
   "dependencies": {
     "@triad/ui": "workspace:*",
-    "axios": "^1.6.7",
-    "motion": "^12.23.22",
-    "next": "15.0.3"
     "bcryptjs": "^3.0.2",
     "ky": "^1.2.3",
+    "motion": "^12.23.22",
     "next": "15.0.3",
     "next-auth": "5.0.0-beta.29",
     "zod": "^3.22.4"
