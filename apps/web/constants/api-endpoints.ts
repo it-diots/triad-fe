@@ -5,24 +5,38 @@
 const API_BASE = "/api/v1";
 
 export const API_ENDPOINTS = {
-  // 인증 관련
+  /**
+   * 인증 관련 API 엔드포인트
+   */
   AUTH: {
+    /** 사용자 로그인 (POST) */
     LOGIN: `${API_BASE}/auth/login`,
+    /** 사용자 회원가입 (POST) */
     REGISTER: `${API_BASE}/auth/register`,
+    /** 사용자 로그아웃 (POST) */
     LOGOUT: `${API_BASE}/auth/logout`,
+    /** 액세스 토큰 갱신 (POST) */
     REFRESH: `${API_BASE}/auth/refresh`,
+    /** 현재 로그인한 사용자 프로필 조회/수정 (GET/PUT) */
     PROFILE: `${API_BASE}/auth/profile`,
-    NEXT_AUTH: "/api/auth", // NextAuth.js 엔드포인트
+    /** NextAuth.js 엔드포인트 */
+    NEXT_AUTH: "/api/auth",
   },
 
-  // 사용자 관련
+  /**
+   * 사용자 관리 관련 API 엔드포인트
+   */
   USERS: {
+    /** 사용자 목록 조회 (GET) */
     LIST: `${API_BASE}/users`,
+    /** 새 사용자 생성 (POST) */
     CREATE: `${API_BASE}/users`,
+    /** 특정 사용자 조회 (GET) */
     BY_ID: (id: string) => `${API_BASE}/users/${id}`,
+    /** 특정 사용자 정보 수정 (PUT/PATCH) */
     UPDATE: (id: string) => `${API_BASE}/users/${id}`,
+    /** 특정 사용자 삭제 (DELETE) */
     DELETE: (id: string) => `${API_BASE}/users/${id}`,
-    PROFILE: `${API_BASE}/auth/profile`, // 현재 사용자 프로필
   },
 } as const;
 
