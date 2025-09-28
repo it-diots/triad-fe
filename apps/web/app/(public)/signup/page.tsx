@@ -109,9 +109,10 @@ export default function SignupPage() {
 
     try {
       const result = await signup({
-        name: formData.name,
         email: formData.email,
         password: formData.password,
+        username: formData.name, // name을 username으로 사용
+        firstName: formData.name, // 추가 정보로 firstName에도 설정
       });
 
       if (result.success) {

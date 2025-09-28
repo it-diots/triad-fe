@@ -11,7 +11,7 @@ import {
 } from "@triad/ui";
 import type { Route } from "next";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { useAuth } from "@/hooks/use-auth";
@@ -23,9 +23,6 @@ import type { FormState } from "@/types/auth";
  */
 export default function LoginPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
-
   const { login, isLoading, error, clearError } = useAuth();
 
   const [formData, setFormData] = useState({
@@ -77,8 +74,8 @@ export default function LoginPage() {
       const result = await login(formData);
 
       if (result.success) {
-        // 로그인 성공시 callbackUrl로 리다이렉트
-        router.push((callbackUrl || "/") as Route);
+        // 로그인 성공시 홈으로 리다이렉트
+        router.push("/" as Route);
       } else {
         setFormState((prev) => ({
           ...prev,
