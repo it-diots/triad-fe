@@ -63,13 +63,13 @@ export function useAuth() {
       const validatedData = SignupRequestSchema.parse(data);
 
       // 새로운 API 클라이언트로 회원가입 요청
-      const response = await apiClient.post(
-        API_ENDPOINTS.AUTH.REGISTER,
-        validatedData
-      );
+      const response = await apiClient.post(API_ENDPOINTS.AUTH.REGISTER, {
+        json: validatedData,
+      });
 
       // 응답 데이터 검증
-      const validatedResponse = SignupResponseSchema.parse(response.data);
+      const responseData = await response.json();
+      const validatedResponse = SignupResponseSchema.parse(responseData);
 
       // 실제 API는 성공 시 직접 데이터를 반환하므로 success 체크 불필요
       if (!validatedResponse.user) {
@@ -93,18 +93,17 @@ export function useAuth() {
     } catch (error: unknown) {
       let errorMessage = "회원가입 중 오류가 발생했습니다.";
 
-      // API 클라이언트 에러 처리
-      if (
-        error &&
-        typeof error === "object" &&
-        "status" in error &&
-        "data" in error
-      ) {
-        const apiError = error as {
-          status: number;
-          data?: { message?: string };
-        };
-        errorMessage = apiError.data?.message || errorMessage;
+      // Ky HTTPError 처리
+      if (error && typeof error === "object" && "response" in error) {
+        const httpError = error as { response?: Response };
+        if (httpError.response) {
+          try {
+            const errorData = await httpError.response.json();
+            errorMessage = errorData.message || errorMessage;
+          } catch {
+            // JSON 파싱 실패 시 기본 메시지 사용
+          }
+        }
       }
       // Zod 검증 에러 처리
       else if (error && typeof error === "object" && "issues" in error) {
@@ -157,7 +156,7 @@ export function useAuth() {
     try {
       const response = await apiClient.get(API_ENDPOINTS.AUTH.PROFILE);
 
-      return response.data;
+      return await response.json();
     } catch (error: unknown) {
       console.error("프로필 조회 오류:", error);
       throw error;
@@ -175,13 +174,13 @@ export function useAuth() {
     try {
       const response = await apiClient.patch(
         API_ENDPOINTS.USERS.BY_ID(session.user.id),
-        profileData
+        { json: profileData }
       );
 
       // 세션 업데이트
       await refreshSession();
 
-      return response.data;
+      return await response.json();
     } catch (error: unknown) {
       console.error("프로필 업데이트 오류:", error);
       throw error;

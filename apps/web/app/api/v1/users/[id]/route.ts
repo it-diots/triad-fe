@@ -28,7 +28,8 @@ const getUserByIdHandler = async (
   const validatedParams = GetUserByIdParamsSchema.parse(resolvedParams);
 
   const response = await apiClient.get(`/api/v1/users/${validatedParams.id}`);
-  const validatedResponse = GetUserByIdResponseSchema.parse(response.data);
+  const responseData = await response.json();
+  const validatedResponse = GetUserByIdResponseSchema.parse(responseData);
 
   return ApiResponseHandler.success(validatedResponse);
 };
@@ -45,12 +46,11 @@ const updateUserHandler = async (
 
   const response = await apiClient.patch(
     `/api/v1/users/${validatedParams.id}`,
-    validatedBody
+    { json: validatedBody }
   );
 
-  const validatedResponse = UpdateUserProfileResponseSchema.parse(
-    response.data
-  );
+  const responseData = await response.json();
+  const validatedResponse = UpdateUserProfileResponseSchema.parse(responseData);
 
   return ApiResponseHandler.success(validatedResponse);
 };
@@ -65,7 +65,8 @@ const deleteUserHandler = async (
   const response = await apiClient.delete(
     `/api/v1/users/${validatedParams.id}`
   );
-  const validatedResponse = DeleteUserResponseSchema.parse(response.data);
+  const responseData = await response.json();
+  const validatedResponse = DeleteUserResponseSchema.parse(responseData);
 
   return ApiResponseHandler.success(validatedResponse);
 };

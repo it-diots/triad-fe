@@ -19,10 +19,13 @@ const refreshTokenHandler = async (request: Request): Promise<Response> => {
   const validatedBody = RefreshTokenRequestSchema.parse(body);
 
   const response = await apiClient.post(API_ENDPOINTS.AUTH.REFRESH, {
-    refreshToken: validatedBody.refreshToken,
+    json: {
+      refreshToken: validatedBody.refreshToken,
+    },
   });
 
-  const validatedResponse = RefreshTokenResponseSchema.parse(response.data);
+  const responseData = await response.json();
+  const validatedResponse = RefreshTokenResponseSchema.parse(responseData);
 
   return ApiResponseHandler.success(validatedResponse);
 };

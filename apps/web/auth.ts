@@ -47,13 +47,13 @@ const nextAuth = NextAuth({
           console.log("✅ 외부 API 서버로 로그인 요청");
 
           // 외부 API 서버로 로그인 요청
-          const response = await apiClient.post(
-            API_ENDPOINTS.AUTH.LOGIN,
-            loginData
-          );
+          const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGIN, {
+            json: loginData,
+          });
 
           // 응답 데이터 검증 (실제 API 응답 구조)
-          const validatedResponse = LoginResponseSchema.parse(response.data);
+          const responseData = await response.json();
+          const validatedResponse = LoginResponseSchema.parse(responseData);
 
           console.log("📊 API 응답 결과:", {
             hasUser: !!validatedResponse.user,
@@ -127,10 +127,10 @@ const nextAuth = NextAuth({
 
         try {
           const response = await apiClient.post(API_ENDPOINTS.AUTH.REFRESH, {
-            refreshToken: token.refreshToken,
+            json: { refreshToken: token.refreshToken },
           });
 
-          const refreshedTokens = response.data as {
+          const refreshedTokens = (await response.json()) as {
             accessToken: string;
             refreshToken: string;
             expiresIn: number;
@@ -164,7 +164,7 @@ const nextAuth = NextAuth({
           setServerToken(token.accessToken as string);
           const response = await apiClient.get(API_ENDPOINTS.AUTH.PROFILE);
 
-          const userData = response.data as {
+          const userData = (await response.json()) as {
             id: string;
             email: string;
             username: string;

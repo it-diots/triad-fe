@@ -24,10 +24,11 @@ const getUsersHandler = async (request: Request): Promise<Response> => {
   });
 
   const response = await apiClient.get(API_ENDPOINTS.USERS.LIST, {
-    params: queryParams,
+    searchParams: queryParams,
   });
 
-  const validatedResponse = GetUsersResponseSchema.parse(response.data);
+  const responseData = await response.json();
+  const validatedResponse = GetUsersResponseSchema.parse(responseData);
 
   return ApiResponseHandler.success(validatedResponse);
 };

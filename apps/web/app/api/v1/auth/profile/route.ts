@@ -30,7 +30,8 @@ const getProfileHandler = async (request: Request): Promise<Response> => {
   setServerToken(token);
   const response = await apiClient.get(API_ENDPOINTS.AUTH.PROFILE);
 
-  const validatedResponse = GetUserProfileResponseSchema.parse(response.data);
+  const responseData = await response.json();
+  const validatedResponse = GetUserProfileResponseSchema.parse(responseData);
 
   return ApiResponseHandler.success(validatedResponse);
 };

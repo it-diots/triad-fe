@@ -17,14 +17,17 @@ const registerHandler = async (request: Request): Promise<Response> => {
   const { email, password, username, firstName, lastName } = validatedBody;
 
   const response = await apiClient.post("/auth/register", {
-    email: email.toLowerCase(),
-    password,
-    username,
-    firstName,
-    lastName,
+    json: {
+      email: email.toLowerCase(),
+      password,
+      username,
+      firstName,
+      lastName,
+    },
   });
 
-  const validatedResponse = SignupResponseSchema.parse(response.data);
+  const responseData = await response.json();
+  const validatedResponse = SignupResponseSchema.parse(responseData);
 
   return ApiResponseHandler.success(validatedResponse, 201);
 };

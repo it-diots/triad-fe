@@ -11,6 +11,13 @@ export interface ApiError {
   };
 }
 
+export interface KyHttpError {
+  name: string;
+  response?: Response;
+  request?: Request;
+  message: string;
+}
+
 export interface ApiErrorHandlerOptions {
   defaultMessage?: string;
   defaultErrorCode?: string;
@@ -36,7 +43,10 @@ export class ApiResponseHandler {
   /**
    * 에러 응답을 생성합니다
    */
-  static error(error: unknown, options: ApiErrorHandlerOptions = {}): Response {
+  static async error(
+    error: unknown,
+    options: ApiErrorHandlerOptions = {}
+  ): Promise<Response> {
     const {
       defaultMessage = "서버 오류가 발생했습니다.",
       defaultErrorCode = "INTERNAL_SERVER_ERROR",
@@ -67,7 +77,38 @@ export class ApiResponseHandler {
       });
     }
 
-    // API 클라이언트 에러 처리
+    // Ky HTTPError 처리
+    if (this.isKyHttpError(error)) {
+      const status = error.response?.status || 500;
+      let errorMessage = defaultMessage;
+      let errorCode = defaultErrorCode;
+
+      try {
+        if (error.response) {
+          const errorData = await error.response.clone().json();
+          errorMessage = errorData.message || errorMessage;
+          errorCode = errorData.error?.code || errorCode;
+        }
+      } catch {
+        // JSON 파싱 실패 시 기본값 사용
+      }
+
+      const errorResponse = {
+        success: false,
+        message: errorMessage,
+        error: { code: errorCode },
+      };
+
+      const validatedError = ErrorResponseSchema.parse(errorResponse);
+      return Response.json(validatedError, {
+        status,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    }
+
+    // 기존 API 클라이언트 에러 처리 (호환성)
     if (this.isApiError(error)) {
       const errorResponse = {
         success: false,
@@ -100,6 +141,19 @@ export class ApiResponseHandler {
         "Content-Type": "application/json",
       },
     });
+  }
+
+  /**
+   * 주어진 에러가 Ky HTTPError인지 확인합니다
+   */
+  private static isKyHttpError(error: unknown): error is KyHttpError {
+    return (
+      error !== null &&
+      typeof error === "object" &&
+      "response" in error &&
+      "name" in error &&
+      (error as any).name === "HTTPError"
+    );
   }
 
   /**

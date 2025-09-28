@@ -17,11 +17,14 @@ const loginHandler = async (request: Request): Promise<Response> => {
   const { email, password } = validatedBody;
 
   const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGIN, {
-    email: email.toLowerCase(),
-    password,
+    json: {
+      email: email.toLowerCase(),
+      password,
+    },
   });
 
-  const validatedResponse = LoginResponseSchema.parse(response.data);
+  const responseData = await response.json();
+  const validatedResponse = LoginResponseSchema.parse(responseData);
 
   return ApiResponseHandler.success(validatedResponse);
 };

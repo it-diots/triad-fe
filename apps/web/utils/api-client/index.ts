@@ -1,108 +1,86 @@
 /**
- * 유니버설 API 클라이언트
- * 환경에 따라 적절한 어댑터를 자동으로 선택
- * - 서버 컴포넌트: KyAdapter (Fetch API 기반)
- * - 클라이언트 컴포넌트: AxiosAdapter 또는 KyAdapter
+ * Ky 기반 API 클라이언트
+ * NextAuth 세션과 연동하여 자동 인증 처리
  */
 
-import { KyAdapter } from "./ky-adapter";
-import { ApiClient, ApiClientConfig } from "./types";
+import ky, { type KyInstance } from "ky";
+
 import { getEnvironmentToken } from "./auth-adapter";
-
-/**
- * 현재 환경이 브라우저인지 확인
- */
-function isBrowser(): boolean {
-  return typeof window !== "undefined";
-}
-
-/**
- * 환경에 따라 적절한 어댑터를 선택하여 API 클라이언트를 생성
- */
-export function createApiClient(
-  config: ApiClientConfig,
-  preferAxios = true
-): ApiClient {
-  // 서버 환경에서는 Ky만 사용 가능 (Fetch API 기반)
-  if (!isBrowser()) {
-    return new KyAdapter(config);
-  }
-
-  // 브라우저 환경에서도 Ky 어댑터 사용 (타입 안전성)
-  return new KyAdapter(config);
-}
 
 /**
  * 기본 API 클라이언트 인스턴스 생성
  */
-export function createDefaultApiClient(): ApiClient {
+export function createApiClient(): KyInstance {
   const baseURL =
     process.env.NEXT_PUBLIC_API_BASE_URL ||
     "http://ec2-13-209-40-130.ap-northeast-2.compute.amazonaws.com:8080";
 
-  const config: ApiClientConfig = {
-    baseURL,
+  return ky.create({
+    prefixUrl: baseURL,
     timeout: 10000,
     headers: {
       "Content-Type": "application/json",
     },
-    interceptors: {
-      request: async (config) => {
-        // 인증 토큰 자동 추가 (NextAuth 세션 우선, fallback으로 로컬 스토리지)
-        try {
-          const token = await getEnvironmentToken();
-          if (token && config.headers) {
-            config.headers.Authorization = `Bearer ${token}`;
-          }
-        } catch (error) {
-          console.warn("토큰 가져오기 실패:", error);
-        }
-        return config;
-      },
-      response: async (response) => {
-        // 응답 로깅 (개발 환경)
-        if (process.env.NODE_ENV === "development") {
-          console.log(`API Response [${response.status}]:`, {
-            url: response.headers["request-url"] || "unknown",
-            status: response.status,
-            data: response.data,
-          });
-        }
-        return response;
-      },
-      error: async (error) => {
-        // 401 에러 시 자동 로그아웃 처리 (클라이언트에서만)
-        if (error.status === 401 && isBrowser()) {
-          localStorage.removeItem("auth-token");
-          sessionStorage.removeItem("auth-token");
-
-          // 현재 페이지가 로그인 페이지가 아니면 리다이렉트
-          if (!window.location.pathname.includes("/login")) {
-            window.location.href = "/login";
-          }
-        }
-
-        // 에러 로깅
-        console.error("API Error:", {
-          message: error.message,
-          status: error.status,
-          data: error.data,
-        });
-
-        throw error;
-      },
+    retry: {
+      limit: 2,
+      methods: ["get", "put", "head", "delete", "options", "trace"],
+      statusCodes: [408, 413, 429, 500, 502, 503, 504],
     },
-  };
+    hooks: {
+      beforeRequest: [
+        async (request) => {
+          // NextAuth 세션 또는 로컬 스토리지에서 토큰 자동 추가
+          try {
+            const token = await getEnvironmentToken();
+            if (token) {
+              request.headers.set("Authorization", `Bearer ${token}`);
+            }
+          } catch (error) {
+            console.warn("토큰 가져오기 실패:", error);
+          }
+        },
+      ],
+      afterResponse: [
+        (_request, _options, response) => {
+          // 개발 환경에서 응답 로깅
+          if (process.env.NODE_ENV === "development") {
+            console.log(`API Response [${response.status}]:`, {
+              url: response.url,
+              status: response.status,
+            });
+          }
+          return response;
+        },
+      ],
+      beforeError: [
+        (error) => {
+          // 401 에러 시 자동 로그아웃 처리 (브라우저에서만)
+          if (error.response?.status === 401 && typeof window !== "undefined") {
+            localStorage.removeItem("auth-token");
+            sessionStorage.removeItem("auth-token");
 
-  return createApiClient(config);
+            // 현재 페이지가 로그인 페이지가 아니면 리다이렉트
+            if (!window.location.pathname.includes("/login")) {
+              window.location.href = "/login";
+            }
+          }
+
+          // 에러 로깅
+          console.error("API Error:", {
+            message: error.message,
+            status: error.response?.status,
+            url: error.request?.url,
+          });
+
+          return error;
+        },
+      ],
+    },
+  });
 }
 
 // 기본 인스턴스 내보내기
-export const apiClient = createDefaultApiClient();
-
-// 타입과 어댑터들도 내보내기
-export { KyAdapter } from "./ky-adapter";
-export * from "./types";
+export const apiClient = createApiClient();
 
 // API 엔드포인트 상수 재내보내기
 export { API_ENDPOINTS } from "../../constants/api-endpoints";
