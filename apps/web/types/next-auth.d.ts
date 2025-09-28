@@ -6,6 +6,8 @@
 import "next-auth";
 import "next-auth/jwt";
 
+import type { TokenErrorCode } from "@/constants/auth-errors";
+
 declare module "next-auth" {
   interface Session {
     user: {
@@ -16,7 +18,7 @@ declare module "next-auth" {
     };
     accessToken: string;
     // 에러 상태 타입 추가
-    error?: "RefreshTokenError" | "RefreshTokenExpired";
+    error?: TokenErrorCode;
   }
 
   interface User {
@@ -38,6 +40,6 @@ declare module "next-auth/jwt" {
     expiresIn: number;
     tokenExpiry: number;
     // JWT 레벨에서도 에러 상태 관리
-    error?: "RefreshTokenError" | "RefreshTokenExpired";
+    error?: TokenErrorCode;
   }
 }

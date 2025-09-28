@@ -1,11 +1,11 @@
 import { GetUserProfileResponseSchema } from "@/schemas/users";
 import { API_ENDPOINTS } from "@/utils/api-client";
+import { createServerApiWithAuth } from "@/utils/api-client";
 import {
   ApiResponseHandler,
   ErrorHandlers,
   withErrorHandler,
 } from "@/utils/api-error-handler";
-import { createServerApiWithAuth } from "@/utils/server-api";
 
 /**
  * 현재 로그인한 사용자 프로필 조회 API 엔드포인트

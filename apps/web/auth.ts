@@ -1,7 +1,17 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
-import { LoginRequestSchema, LoginResponseSchema } from "@/schemas/auth";
+import {
+  isApiError,
+  isHttpError,
+  TOKEN_ERROR_CODES,
+} from "@/constants/auth-errors";
+import {
+  LoginRequestSchema,
+  LoginResponseSchema,
+  RefreshTokenResponseSchema,
+} from "@/schemas/auth";
+import { GetUserProfileResponseSchema } from "@/schemas/users";
 import { API_ENDPOINTS, apiClient } from "@/utils/api-client";
 import { setServerToken } from "@/utils/api-client/auth-adapter";
 
@@ -85,15 +95,11 @@ const nextAuth = NextAuth({
           console.error("❌ 인증 오류:", error);
 
           // API 에러 로깅
-          if (error && typeof error === "object" && "status" in error) {
-            const apiError = error as {
-              status: number;
-              data?: { message?: string; error?: { code?: string } };
-            };
+          if (isApiError(error)) {
             console.error("API 에러 상세:", {
-              status: apiError.status,
-              message: apiError.data?.message,
-              code: apiError.data?.error?.code,
+              status: error.status,
+              message: error.data?.message,
+              code: error.data?.error?.code,
             });
           }
 
@@ -125,7 +131,8 @@ const nextAuth = NextAuth({
       const refreshThreshold = 5 * 60 * 1000; // 5분
       const shouldRefresh =
         token.tokenExpiry &&
-        Date.now() > (token.tokenExpiry as number) - refreshThreshold;
+        typeof token.tokenExpiry === "number" &&
+        Date.now() > token.tokenExpiry - refreshThreshold;
 
       if (shouldRefresh) {
         console.log("🔄 토큰 갱신 시도 (만료 전 갱신)");
@@ -135,11 +142,9 @@ const nextAuth = NextAuth({
             json: { refreshToken: token.refreshToken },
           });
 
-          const refreshedTokens = (await response.json()) as {
-            accessToken: string;
-            refreshToken: string;
-            expiresIn: number;
-          };
+          const responseData = await response.json();
+          const refreshedTokens =
+            RefreshTokenResponseSchema.parse(responseData);
 
           // 새로운 refresh token이 있으면 교체, 없으면 기존 유지
           const newRefreshToken =
@@ -155,17 +160,16 @@ const nextAuth = NextAuth({
           console.error("❌ 토큰 갱신 실패:", error);
 
           // 에러 타입에 따른 차별화된 처리
-          if (error && typeof error === "object" && "response" in error) {
-            const httpError = error as { response?: { status?: number } };
-            if (httpError.response?.status === 401) {
+          if (isHttpError(error)) {
+            if (error.response?.status === 401) {
               // refresh token이 만료된 경우 - 재로그인 필요
-              token.error = "RefreshTokenExpired";
+              token.error = TOKEN_ERROR_CODES.REFRESH_TOKEN_EXPIRED;
             } else {
               // 네트워크 오류 등 - 재시도 가능
-              token.error = "RefreshTokenError";
+              token.error = TOKEN_ERROR_CODES.REFRESH_TOKEN_ERROR;
             }
           } else {
-            token.error = "RefreshTokenError";
+            token.error = TOKEN_ERROR_CODES.REFRESH_TOKEN_ERROR;
           }
 
           return token; // null 반환 대신 error flag와 함께 토큰 반환
@@ -178,46 +182,43 @@ const nextAuth = NextAuth({
     async session({ session, token }) {
       // 토큰 에러 상태 확인
       if (token?.error) {
-        session.error = token.error as
-          | "RefreshTokenError"
-          | "RefreshTokenExpired";
+        session.error = token.error;
         return session;
       }
 
       // 세션에 사용자 정보와 토큰 추가
-      if (token?.id) {
-        session.user.id = token.id as string;
-        session.accessToken = token.accessToken as string;
+      if (token?.id && typeof token.id === "string") {
+        session.user.id = token.id;
 
-        // 외부 API에서 최신 사용자 정보 가져오기
-        try {
-          // 서버 환경에서 토큰 설정
-          setServerToken(token.accessToken as string);
-          const response = await apiClient.get(API_ENDPOINTS.AUTH.PROFILE);
+        if (typeof token.accessToken === "string") {
+          session.accessToken = token.accessToken;
 
-          const userData = (await response.json()) as {
-            id: string;
-            email: string;
-            username: string;
-            firstName?: string;
-            lastName?: string;
-            avatar?: string;
-          };
+          // 외부 API에서 최신 사용자 정보 가져오기
+          try {
+            // 서버 환경에서 토큰 설정
+            setServerToken(token.accessToken);
+            const response = await apiClient.get(API_ENDPOINTS.AUTH.PROFILE);
 
-          if (userData) {
-            session.user = {
-              ...session.user,
-              id: userData.id,
-              email: userData.email,
-              name:
-                `${userData.firstName || ""} ${userData.lastName || ""}`.trim() ||
-                userData.username,
-              image: userData.avatar,
-            };
+            const responseData = await response.json();
+            const validatedResponse =
+              GetUserProfileResponseSchema.parse(responseData);
+            const userData = validatedResponse.data;
+
+            if (userData) {
+              session.user = {
+                ...session.user,
+                id: userData.id,
+                email: userData.email,
+                name:
+                  `${userData.firstName || ""} ${userData.lastName || ""}`.trim() ||
+                  userData.username,
+                image: userData.avatar,
+              };
+            }
+          } catch (error) {
+            console.error("세션 업데이트 중 사용자 정보 조회 오류:", error);
+            // 사용자 정보 조회 실패해도 기존 세션 정보는 유지
           }
-        } catch (error) {
-          console.error("세션 업데이트 중 사용자 정보 조회 오류:", error);
-          // 사용자 정보 조회 실패해도 기존 세션 정보는 유지
         }
       }
 
