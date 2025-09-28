@@ -121,9 +121,14 @@ const nextAuth = NextAuth({
         token.tokenExpiry = Date.now() + user.expiresIn * 1000;
       }
 
-      // 토큰 만료 확인 및 갱신
-      if (token.tokenExpiry && Date.now() > (token.tokenExpiry as number)) {
-        console.log("🔄 토큰 만료, 갱신 시도");
+      // 토큰 만료 전 미리 갱신 (5분 여유)
+      const refreshThreshold = 5 * 60 * 1000; // 5분
+      const shouldRefresh =
+        token.tokenExpiry &&
+        Date.now() > (token.tokenExpiry as number) - refreshThreshold;
+
+      if (shouldRefresh) {
+        console.log("🔄 토큰 갱신 시도 (만료 전 갱신)");
 
         try {
           const response = await apiClient.post(API_ENDPOINTS.AUTH.REFRESH, {
@@ -136,16 +141,34 @@ const nextAuth = NextAuth({
             expiresIn: number;
           };
 
+          // 새로운 refresh token이 있으면 교체, 없으면 기존 유지
+          const newRefreshToken =
+            refreshedTokens.refreshToken || token.refreshToken;
+
           token.accessToken = refreshedTokens.accessToken;
-          token.refreshToken = refreshedTokens.refreshToken;
+          token.refreshToken = newRefreshToken;
           token.expiresIn = refreshedTokens.expiresIn;
           token.tokenExpiry = Date.now() + refreshedTokens.expiresIn * 1000;
 
           console.log("✅ 토큰 갱신 성공");
         } catch (error) {
           console.error("❌ 토큰 갱신 실패:", error);
-          // 토큰 갱신 실패 시 로그아웃 처리
-          return null;
+
+          // 에러 타입에 따른 차별화된 처리
+          if (error && typeof error === "object" && "response" in error) {
+            const httpError = error as { response?: { status?: number } };
+            if (httpError.response?.status === 401) {
+              // refresh token이 만료된 경우 - 재로그인 필요
+              token.error = "RefreshTokenExpired";
+            } else {
+              // 네트워크 오류 등 - 재시도 가능
+              token.error = "RefreshTokenError";
+            }
+          } else {
+            token.error = "RefreshTokenError";
+          }
+
+          return token; // null 반환 대신 error flag와 함께 토큰 반환
         }
       }
 
@@ -153,6 +176,14 @@ const nextAuth = NextAuth({
     },
 
     async session({ session, token }) {
+      // 토큰 에러 상태 확인
+      if (token?.error) {
+        session.error = token.error as
+          | "RefreshTokenError"
+          | "RefreshTokenExpired";
+        return session;
+      }
+
       // 세션에 사용자 정보와 토큰 추가
       if (token?.id) {
         session.user.id = token.id as string;

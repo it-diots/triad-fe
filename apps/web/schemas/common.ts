@@ -72,24 +72,62 @@ export const TimestampsSchema = z.object({
 });
 
 /**
- * 이메일 스키마
+ * 더 사용자 친화적인 이메일 스키마
  */
 export const EmailSchema = z
-  .string()
-  .email("유효하지 않은 이메일 형식입니다")
-  .max(255, "이메일은 255자를 초과할 수 없습니다");
+  .string({
+    required_error: "이메일 주소를 입력해주세요",
+    invalid_type_error: "이메일 주소 형식이 올바르지 않습니다",
+  })
+  .min(1, "이메일 주소를 입력해주세요")
+  .email("올바른 이메일 주소 형식을 입력해주세요 (예: user@example.com)")
+  .max(255, "이메일 주소는 255자를 초과할 수 없습니다")
+  .toLowerCase() // 이메일 정규화
+  .trim(); // 공백 제거
 
 /**
- * 비밀번호 스키마
+ * 강화된 비밀번호 스키마
  */
 export const PasswordSchema = z
-  .string()
+  .string({
+    required_error: "비밀번호를 입력해주세요",
+    invalid_type_error: "비밀번호는 문자열이어야 합니다",
+  })
   .min(8, "비밀번호는 최소 8자 이상이어야 합니다")
   .max(128, "비밀번호는 128자를 초과할 수 없습니다")
   .regex(
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-    "비밀번호는 대문자, 소문자, 숫자를 포함해야 합니다"
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/,
+    "비밀번호는 대문자, 소문자, 숫자, 특수문자(@$!%*?&)를 각각 최소 1개씩 포함해야 합니다"
   );
+
+/**
+ * 안전한 비밀번호 확인 스키마
+ */
+export const PasswordConfirmSchema = z
+  .object({
+    password: PasswordSchema,
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "비밀번호가 일치하지 않습니다",
+    path: ["confirmPassword"], // 에러 위치 지정
+  });
+
+/**
+ * 사용자명 스키마
+ */
+export const UsernameSchema = z
+  .string({
+    required_error: "사용자명을 입력해주세요",
+  })
+  .min(3, "사용자명은 최소 3자 이상이어야 합니다")
+  .max(20, "사용자명은 20자를 초과할 수 없습니다")
+  .regex(
+    /^[a-zA-Z0-9_-]+$/,
+    "사용자명은 영문, 숫자, 언더스코어(_), 하이픈(-)만 사용할 수 있습니다"
+  )
+  .toLowerCase()
+  .trim();
 
 // 타입 추출
 export type BaseApiResponse = z.infer<typeof BaseApiResponseSchema>;

@@ -2,6 +2,8 @@ import { ZodError } from "zod";
 
 import { ErrorResponseSchema } from "@/schemas/common";
 
+import { formatZodError } from "./zod-helpers";
+
 export interface ApiError {
   status: number;
   data?: {
@@ -57,11 +59,13 @@ export class ApiResponseHandler {
       console.error("API 오류:", error);
     }
 
-    // Zod 검증 에러 처리
+    // Zod 검증 에러 처리 - 개선된 메시지 사용
     if (error instanceof ZodError) {
+      const userFriendlyMessage = formatZodError(error);
+
       const errorResponse = {
         success: false,
-        message: "입력 데이터가 유효하지 않습니다.",
+        message: userFriendlyMessage,
         error: {
           code: "VALIDATION_ERROR",
           details: error.errors,
@@ -206,7 +210,7 @@ export class ApiResponseHandler {
 /**
  * API 라우트 핸들러를 감싸는 HOC
  */
-export function withErrorHandler<T extends any[]>(
+export function withErrorHandler<T extends unknown[]>(
   handler: (...args: T) => Promise<Response>,
   options?: ApiErrorHandlerOptions
 ) {

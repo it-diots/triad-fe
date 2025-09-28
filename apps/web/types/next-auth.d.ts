@@ -15,6 +15,8 @@ declare module "next-auth" {
       image?: string | null;
     };
     accessToken: string;
+    // 에러 상태 타입 추가
+    error?: "RefreshTokenError" | "RefreshTokenExpired";
   }
 
   interface User {
@@ -35,5 +37,7 @@ declare module "next-auth/jwt" {
     refreshToken: string;
     expiresIn: number;
     tokenExpiry: number;
+    // JWT 레벨에서도 에러 상태 관리
+    error?: "RefreshTokenError" | "RefreshTokenExpired";
   }
 }

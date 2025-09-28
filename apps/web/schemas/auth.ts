@@ -5,7 +5,12 @@
 
 import { z } from "zod";
 
-import { EmailSchema, PasswordSchema, TimestampsSchema } from "./common";
+import {
+  EmailSchema,
+  PasswordSchema,
+  TimestampsSchema,
+  UsernameSchema,
+} from "./common";
 
 /**
  * 사용자 기본 정보 스키마 (실제 API 응답 구조)
@@ -60,17 +65,22 @@ export const LoginResponseSchema = TokenResponseSchema;
 
 /**
  * 회원가입 요청 스키마 (실제 API RegisterDto)
+ * 강화된 검증과 에러 메시지
  */
 export const SignupRequestSchema = z.object({
   email: EmailSchema,
   password: PasswordSchema,
-  username: z
+  username: UsernameSchema,
+  firstName: z
     .string()
-    .min(3)
-    .max(20)
-    .regex(/^[a-zA-Z0-9_-]+$/),
-  firstName: z.string().max(100).optional(),
-  lastName: z.string().max(100).optional(),
+    .max(100, "이름은 100자를 초과할 수 없습니다")
+    .trim()
+    .optional(),
+  lastName: z
+    .string()
+    .max(100, "성은 100자를 초과할 수 없습니다")
+    .trim()
+    .optional(),
 });
 
 /**

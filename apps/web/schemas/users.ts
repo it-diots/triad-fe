@@ -89,7 +89,6 @@ export const DeleteUserResponseSchema = z.object({
   message: z.string(),
 });
 
-
 // 타입 추출
 export type UserProfile = z.infer<typeof UserProfileSchema>;
 export type UpdateUserProfileRequest = z.infer<
