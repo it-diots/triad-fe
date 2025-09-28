@@ -6,7 +6,7 @@ import {
   UpdateUserProfileRequestSchema,
   UpdateUserProfileResponseSchema,
 } from "@/schemas/users";
-import { apiClient } from "@/utils/api-client";
+import { API_ENDPOINTS, apiClient } from "@/utils/api-client";
 import {
   ApiResponseHandler,
   ErrorHandlers,
@@ -27,7 +27,9 @@ const getUserByIdHandler = async (
   const resolvedParams = await params;
   const validatedParams = GetUserByIdParamsSchema.parse(resolvedParams);
 
-  const response = await apiClient.get(`/api/v1/users/${validatedParams.id}`);
+  const response = await apiClient.get(
+    API_ENDPOINTS.USERS.BY_ID(validatedParams.id)
+  );
   const responseData = await response.json();
   const validatedResponse = GetUserByIdResponseSchema.parse(responseData);
 
@@ -41,11 +43,11 @@ const updateUserHandler = async (
   const resolvedParams = await params;
   const validatedParams = GetUserByIdParamsSchema.parse(resolvedParams);
 
-  const body = await request.json();
+  const body: unknown = await request.json();
   const validatedBody = UpdateUserProfileRequestSchema.parse(body);
 
   const response = await apiClient.patch(
-    `/api/v1/users/${validatedParams.id}`,
+    API_ENDPOINTS.USERS.BY_ID(validatedParams.id),
     { json: validatedBody }
   );
 
@@ -63,7 +65,7 @@ const deleteUserHandler = async (
   const validatedParams = DeleteUserParamsSchema.parse(resolvedParams);
 
   const response = await apiClient.delete(
-    `/api/v1/users/${validatedParams.id}`
+    API_ENDPOINTS.USERS.BY_ID(validatedParams.id)
   );
   const responseData = await response.json();
   const validatedResponse = DeleteUserResponseSchema.parse(responseData);

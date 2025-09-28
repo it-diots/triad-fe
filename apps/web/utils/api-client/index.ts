@@ -9,11 +9,36 @@ import { getEnvironmentToken } from "./auth-adapter";
 
 /**
  * 기본 API 클라이언트 인스턴스 생성
+ * NextAuth 세션과 연동된 Ky 기반 HTTP 클라이언트를 생성합니다.
+ *
+ * @returns 설정된 Ky 인스턴스
+ *
+ * @example
+ * ```typescript
+ * import { createApiClient } from '@/utils/api-client';
+ *
+ * // 기본 클라이언트 생성
+ * const client = createApiClient();
+ *
+ * // GET 요청
+ * const users = await client.get('users').json();
+ *
+ * // POST 요청
+ * const newUser = await client.post('users', {
+ *   json: { name: 'John', email: 'john@example.com' }
+ * }).json();
+ *
+ * // 자동 재시도 및 에러 처리
+ * try {
+ *   const data = await client.get('api/data').json();
+ * } catch (error) {
+ *   // 401 에러 시 자동 로그아웃 처리됨
+ *   console.error('API 요청 실패:', error);
+ * }
+ * ```
  */
 export function createApiClient(): KyInstance {
-  const baseURL =
-    process.env.NEXT_PUBLIC_API_BASE_URL ||
-    "http://ec2-13-209-40-130.ap-northeast-2.compute.amazonaws.com:8080";
+  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   const isProduction = process.env.NODE_ENV === "production";
 

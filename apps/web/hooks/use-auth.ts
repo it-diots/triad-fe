@@ -5,8 +5,13 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { useState } from "react";
 
 import { SignupRequestSchema, SignupResponseSchema } from "@/schemas/auth";
+import {
+  type UpdateUserProfileRequest,
+  UpdateUserProfileRequestSchema,
+} from "@/schemas/users";
 import type { AuthStatus, LoginRequest, SignupRequest } from "@/types/auth";
 import { API_ENDPOINTS, apiClient } from "@/utils/api-client";
+import { formatZodError } from "@/utils/zod-helpers";
 
 /**
  * 인증 관련 커스텀 훅
@@ -52,7 +57,7 @@ export function useAuth() {
   };
 
   /**
-   * 회원가입 함수 (새로운 API 클라이언트와 Zod 스키마 사용)
+   * 회원가입 함수
    */
   const signup = async (data: SignupRequest) => {
     setIsLoading(true);
@@ -62,7 +67,7 @@ export function useAuth() {
       // 요청 데이터 검증
       const validatedData = SignupRequestSchema.parse(data);
 
-      // 새로운 API 클라이언트로 회원가입 요청
+      // 회원가입 요청
       const response = await apiClient.post(API_ENDPOINTS.AUTH.REGISTER, {
         json: validatedData,
       });
@@ -71,13 +76,9 @@ export function useAuth() {
       const responseData = await response.json();
       const validatedResponse = SignupResponseSchema.parse(responseData);
 
-      // 실제 API는 성공 시 직접 데이터를 반환하므로 success 체크 불필요
       if (!validatedResponse.user) {
         setError("회원가입 중 오류가 발생했습니다.");
-        return {
-          success: false,
-          error: "회원가입 실패",
-        };
+        return { success: false, error: "회원가입 실패" };
       }
 
       // 회원가입 성공 후 자동 로그인 시도
@@ -91,26 +92,20 @@ export function useAuth() {
         ...loginResult,
       };
     } catch (error: unknown) {
-      let errorMessage = "회원가입 중 오류가 발생했습니다.";
-
-      // Ky HTTPError 처리
-      if (error && typeof error === "object" && "response" in error) {
-        const httpError = error as { response?: Response };
-        if (httpError.response) {
-          try {
-            const errorData = await httpError.response.json();
-            errorMessage = errorData.message || errorMessage;
-          } catch {
-            // JSON 파싱 실패 시 기본 메시지 사용
-          }
-        }
-      }
-      // Zod 검증 에러 처리
-      else if (error && typeof error === "object" && "issues" in error) {
-        const zodError = error as { issues: Array<{ message?: string }> };
-        errorMessage = zodError.issues[0]?.message || errorMessage;
+      // Zod 검증 에러는 formatZodError 사용
+      if (error && typeof error === "object" && "issues" in error) {
+        const zodError = error as {
+          issues: Array<{ message?: string; path: string[] }>;
+        };
+        const formattedError = formatZodError(
+          zodError as import("zod").ZodError
+        );
+        setError(formattedError);
+        return { success: false, error: formattedError };
       }
 
+      // HTTP 에러는 API 클라이언트에서 이미 처리됨
+      const errorMessage = "회원가입 중 오류가 발생했습니다.";
       setError(errorMessage);
       console.error("회원가입 오류:", error);
       return { success: false, error: errorMessage };
@@ -146,7 +141,7 @@ export function useAuth() {
   };
 
   /**
-   * 프로필 정보 가져오기 (새로운 API 사용)
+   * 프로필 정보 가져오기
    */
   const getProfile = async () => {
     if (!session?.accessToken) {
@@ -164,17 +159,20 @@ export function useAuth() {
   };
 
   /**
-   * 프로필 업데이트 (새로운 API 사용)
+   * 프로필 업데이트
    */
-  const updateProfile = async (profileData: Record<string, unknown>) => {
+  const updateProfile = async (profileData: UpdateUserProfileRequest) => {
     if (!session?.accessToken) {
       throw new Error("인증이 필요합니다.");
     }
 
     try {
+      // 요청 데이터 검증
+      const validatedData = UpdateUserProfileRequestSchema.parse(profileData);
+
       const response = await apiClient.patch(
         API_ENDPOINTS.USERS.BY_ID(session.user.id),
-        { json: profileData }
+        { json: validatedData }
       );
 
       // 세션 업데이트
@@ -182,6 +180,18 @@ export function useAuth() {
 
       return await response.json();
     } catch (error: unknown) {
+      // Zod 검증 에러는 formatZodError 사용
+      if (error && typeof error === "object" && "issues" in error) {
+        const zodError = error as {
+          issues: Array<{ message?: string; path: string[] }>;
+        };
+        const formattedError = formatZodError(
+          zodError as import("zod").ZodError
+        );
+        console.error("프로필 업데이트 검증 오류:", formattedError);
+        throw new Error(formattedError);
+      }
+
       console.error("프로필 업데이트 오류:", error);
       throw error;
     }
@@ -191,14 +201,14 @@ export function useAuth() {
    * 인증 상태 확인
    */
   const isAuthenticated = status === "authenticated";
-  const isLoading_auth = status === "loading";
+  const isAuthLoading = status === "loading";
   const user = session?.user || null;
 
   /**
    * 로그인 필요 페이지 리다이렉트
    */
   const requireAuth = () => {
-    if (!isAuthenticated && !isLoading_auth) {
+    if (!isAuthenticated && !isAuthLoading) {
       router.push("/login");
       return false;
     }
@@ -210,7 +220,7 @@ export function useAuth() {
     user,
     session,
     isAuthenticated,
-    isLoading: isLoading_auth || isLoading,
+    isLoading: isAuthLoading || isLoading,
     error,
     status: status as AuthStatus,
 
@@ -221,7 +231,6 @@ export function useAuth() {
     refreshSession,
     requireAuth,
 
-    // 새로운 API 메서드
     getProfile,
     updateProfile,
 

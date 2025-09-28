@@ -9,17 +9,6 @@
 // 기존 코드와의 호환성을 위해 유지되는 타입들
 export type AuthStatus = "loading" | "authenticated" | "unauthenticated";
 
-export interface FormState {
-  isLoading: boolean;
-  error: string | null;
-  success: string | null;
-}
-
-export interface ValidationError {
-  field: string;
-  message: string;
-}
-
 // 새로운 타입 시스템으로 마이그레이션을 위한 re-export
 export type {
   LoginRequest,
@@ -30,12 +19,7 @@ export type {
 } from "@/schemas/auth";
 
 // 사용자 프로필 업데이트 타입은 users 스키마에서 가져옴
-export type {
-  ApiResponse,
-  BaseApiResponse,
-  ErrorResponse,
-} from "@/schemas/common";
-export type { UpdateUserProfileRequestSchema as ProfileUpdateRequest } from "@/schemas/users";
+export type { ApiResponse, ErrorResponse } from "@/schemas/common";
 
 // 새로운 타입 시스템으로 마이그레이션을 권장하는 메시지
 console.warn(

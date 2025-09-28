@@ -1,12 +1,35 @@
 /**
  * Zod 유틸리티
- * 더 나은 에러 처리와 사용자 친화적 메시지 제공
+ * 에러 처리와 사용자 친화적 메시지 제공
  */
 
 import { ZodError, ZodIssue } from "zod";
 
 /**
  * ZodError를 사용자 친화적인 메시지로 변환
+ *
+ * @param error - 변환할 ZodError 객체
+ * @returns 사용자가 이해하기 쉬운 한국어 에러 메시지
+ *
+ * @example
+ * ```typescript
+ * import { z } from 'zod';
+ * import { formatZodError } from '@/utils/zod-helpers';
+ *
+ * const userSchema = z.object({
+ *   email: z.string().email(),
+ *   password: z.string().min(8)
+ * });
+ *
+ * try {
+ *   userSchema.parse({ email: 'invalid-email', password: '123' });
+ * } catch (error) {
+ *   if (error instanceof ZodError) {
+ *     const message = formatZodError(error);
+ *     console.log(message); // "비밀번호는 최소 8자 이상이어야 합니다"
+ *   }
+ * }
+ * ```
  */
 export function formatZodError(error: ZodError): string {
   const issues = error.issues;
@@ -77,6 +100,34 @@ function formatSingleIssue(issue: ZodIssue): string {
 /**
  * ZodError를 필드별 에러 객체로 변환
  * 폼 라이브러리와 함께 사용하기 적합
+ *
+ * @param error - 변환할 ZodError 객체
+ * @returns 필드명을 키로 하는 에러 메시지 객체
+ *
+ * @example
+ * ```typescript
+ * import { z } from 'zod';
+ * import { flattenZodError } from '@/utils/zod-helpers';
+ *
+ * const schema = z.object({
+ *   email: z.string().email(),
+ *   password: z.string().min(8),
+ *   confirmPassword: z.string()
+ * });
+ *
+ * try {
+ *   schema.parse({ email: 'invalid', password: '123', confirmPassword: '456' });
+ * } catch (error) {
+ *   if (error instanceof ZodError) {
+ *     const fieldErrors = flattenZodError(error);
+ *     console.log(fieldErrors);
+ *     // {
+ *     //   email: "올바른 이메일 주소를 입력해주세요.",
+ *     //   password: "비밀번호는 최소 8자 이상이어야 합니다"
+ *     // }
+ *   }
+ * }
+ * ```
  */
 export function flattenZodError(error: ZodError): Record<string, string> {
   const fieldErrors: Record<string, string> = {};
@@ -94,6 +145,30 @@ export function flattenZodError(error: ZodError): Record<string, string> {
 /**
  * 안전한 파싱 유틸리티
  * 성공/실패를 명확히 구분하는 타입 안전한 파서
+ *
+ * @param schema - 파싱에 사용할 Zod 스키마
+ * @param data - 검증할 데이터
+ * @returns 성공 시 데이터와 함께, 실패 시 에러 메시지와 함께 반환
+ *
+ * @example
+ * ```typescript
+ * import { z } from 'zod';
+ * import { safeParse } from '@/utils/zod-helpers';
+ *
+ * const userSchema = z.object({
+ *   name: z.string(),
+ *   age: z.number().min(0)
+ * });
+ *
+ * const result = safeParse(userSchema, { name: 'John', age: 25 });
+ *
+ * if (result.success) {
+ *   console.log('사용자 데이터:', result.data);
+ * } else {
+ *   console.log('에러:', result.error);
+ *   console.log('필드 에러:', result.fieldErrors);
+ * }
+ * ```
  */
 export function safeParse<T>(
   schema: {
@@ -120,6 +195,35 @@ export function safeParse<T>(
 
 /**
  * 비동기 검증을 위한 유틸리티
+ * 비동기 스키마 검증을 안전하게 처리
+ *
+ * @param schema - 비동기 파싱을 지원하는 Zod 스키마
+ * @param data - 검증할 데이터
+ * @returns 성공 시 데이터와 함께, 실패 시 에러 메시지와 함께 반환하는 Promise
+ *
+ * @example
+ * ```typescript
+ * import { z } from 'zod';
+ * import { safeParseAsync } from '@/utils/zod-helpers';
+ *
+ * const asyncUserSchema = z.object({
+ *   email: z.string().email().refine(async (email) => {
+ *     // 비동기 이메일 중복 검사
+ *     const exists = await checkEmailExists(email);
+ *     return !exists;
+ *   }, '이미 사용 중인 이메일입니다')
+ * });
+ *
+ * const result = await safeParseAsync(asyncUserSchema, {
+ *   email: 'user@example.com'
+ * });
+ *
+ * if (result.success) {
+ *   console.log('검증 성공:', result.data);
+ * } else {
+ *   console.log('검증 실패:', result.error);
+ * }
+ * ```
  */
 export async function safeParseAsync<T>(
   schema: {

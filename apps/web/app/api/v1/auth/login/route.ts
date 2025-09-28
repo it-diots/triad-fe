@@ -10,9 +10,8 @@ import {
  * 로그인 API 엔드포인트
  * 외부 API 서버와 통신하여 사용자 인증을 처리합니다.
  */
-
 const loginHandler = async (request: Request): Promise<Response> => {
-  const body = await request.json();
+  const body: unknown = await request.json();
   const validatedBody = LoginRequestSchema.parse(body);
   const { email, password } = validatedBody;
 

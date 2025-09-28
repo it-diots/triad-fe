@@ -11,7 +11,6 @@ import {
  * 현재 로그인한 사용자 프로필 조회 API 엔드포인트
  * 외부 API 서버와 통신하여 인증된 사용자의 프로필 정보를 가져옵니다.
  */
-
 const getProfileHandler = async (request: Request): Promise<Response> => {
   const authHeader = request.headers.get("authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {

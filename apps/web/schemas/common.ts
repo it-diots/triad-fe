@@ -51,9 +51,24 @@ export function createSuccessResponseSchema<T extends z.ZodTypeAny>(
  * 에러 응답 스키마 (실제 API 스펙에 맞게 수정)
  */
 export const ErrorResponseSchema = z.object({
+  success: z.literal(false),
   message: z.string(),
-  error: z.string(),
-  statusCode: z.number(),
+  error: z.object({
+    code: z.string(),
+    details: z.unknown().optional(),
+  }),
+});
+
+/**
+ * API 에러 데이터 스키마 (외부 API 응답용)
+ */
+export const ApiErrorDataSchema = z.object({
+  message: z.string().optional(),
+  error: z
+    .object({
+      code: z.string().optional(),
+    })
+    .optional(),
 });
 
 /**
@@ -133,6 +148,7 @@ export const UsernameSchema = z
 export type BaseApiResponse = z.infer<typeof BaseApiResponseSchema>;
 export type Pagination = z.infer<typeof PaginationSchema>;
 export type ErrorResponse = z.infer<typeof ErrorResponseSchema>;
+export type ApiErrorData = z.infer<typeof ApiErrorDataSchema>;
 export type IdParam = z.infer<typeof IdParamSchema>;
 
 // 호환성을 위한 추가 타입들

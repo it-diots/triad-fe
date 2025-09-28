@@ -1,26 +1,47 @@
 /**
- * API 관련 TypeScript 타입 정의
- * Zod 스키마에서 추출된 타입들과 추가 유틸리티 타입들
+ * API 관련 타입 정의
+ * RESTful API와 클라이언트 간의 데이터 교환을 위한 타입들
  */
 
-// 공통 타입들 내보내기
-export * from "../schemas/auth";
-export * from "../schemas/common";
-export * from "../schemas/users";
+// Re-export from schemas for convenience
+export type {
+  LoginRequest,
+  LoginResponse,
+  RefreshTokenRequest,
+  RefreshTokenResponse,
+  SignupRequest,
+  SignupResponse,
+  // Auth types
+  User,
+} from "@/schemas/auth";
+export type {
+  ApiErrorData,
+  ApiResponse,
+  // Common types
+  BaseApiResponse,
+  ErrorResponse,
+  IdParam,
+  Pagination,
+} from "@/schemas/common";
 
-/**
- * API 엔드포인트 경로 타입
- */
-export type ApiEndpoint =
-  | "/api/auth/login"
-  | "/api/auth/signup"
-  | "/api/auth/logout"
-  | "/api/auth/refresh"
-  | "/api/auth/verify"
-  | "/api/users/profile"
-  | `/api/users/${string}`
-  | "/api/users/stats"
-  | "/api/users/activity-logs";
+// Import Pagination separately for interface extension
+export type {
+  DeleteUserParams,
+  DeleteUserResponse,
+  ExtendedUserProfile,
+  GetUserByIdParams,
+  GetUserByIdResponse,
+  GetUserProfileResponse,
+  GetUsersQuery,
+  GetUsersResponse,
+  UpdateUserProfileRequest,
+  UpdateUserProfileResponse,
+  // User types
+  UserProfile,
+} from "@/schemas/users";
+
+// API-specific types
+export type ApiEndpoint = string;
 
 /**
  * HTTP 상태 코드 타입

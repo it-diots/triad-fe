@@ -7,6 +7,10 @@ module.exports = {
   plugins: ["@typescript-eslint", "unused-imports", "simple-import-sort"],
   rules: {
     "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-unsafe-assignment": "error",
+    "@typescript-eslint/no-unsafe-member-access": "error",
+    "@typescript-eslint/no-unsafe-call": "error",
     "unused-imports/no-unused-imports": "warn",
     "unused-imports/no-unused-vars": [
       "warn",

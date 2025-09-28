@@ -10,6 +10,31 @@ import { getSession } from "next-auth/react";
  */
 let serverToken: string | null = null;
 
+/**
+ * 서버 환경에서 사용할 토큰 설정
+ * API 라우트에서 NextAuth 세션 토큰을 전달할 때 사용
+ *
+ * @param token - 설정할 인증 토큰 (또는 null로 초기화)
+ *
+ * @example
+ * ```typescript
+ * import { setServerToken } from '@/utils/api-client/auth-adapter';
+ *
+ * // API 라우트에서 사용
+ * export async function GET(request: Request) {
+ *   const session = await getServerSession(authOptions);
+ *
+ *   if (session?.accessToken) {
+ *     setServerToken(session.accessToken);
+ *   }
+ *
+ *   // 이후 apiClient 사용 시 자동으로 토큰 주입됨
+ *   const data = await apiClient.get('users').json();
+ *
+ *   return Response.json(data);
+ * }
+ * ```
+ */
 export function setServerToken(token: string | null) {
   serverToken = token;
 }
@@ -18,6 +43,34 @@ export function setServerToken(token: string | null) {
  * 환경에 따른 토큰 가져오기
  * 1. 서버: serverToken 사용
  * 2. 브라우저: NextAuth 세션 → localStorage → sessionStorage 순서
+ *
+ * @returns 현재 환경에서 사용 가능한 인증 토큰 (또는 null)
+ *
+ * @example
+ * ```typescript
+ * import { getEnvironmentToken } from '@/utils/api-client/auth-adapter';
+ *
+ * // 클라이언트 컴포넌트에서 사용
+ * const token = await getEnvironmentToken();
+ * if (token) {
+ *   console.log('로그인 상태');
+ * } else {
+ *   console.log('비로그인 상태');
+ * }
+ *
+ * // API 호출 전 수동 토큰 확인
+ * async function makeAuthenticatedRequest() {
+ *   const token = await getEnvironmentToken();
+ *
+ *   if (!token) {
+ *     throw new Error('인증이 필요한 요청입니다.');
+ *   }
+ *
+ *   return fetch('/api/protected', {
+ *     headers: { Authorization: `Bearer ${token}` }
+ *   });
+ * }
+ * ```
  */
 export async function getEnvironmentToken(): Promise<string | null> {
   // 서버 환경
