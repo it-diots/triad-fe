@@ -145,7 +145,4 @@ export const apiClient = createApiClient();
 export { API_ENDPOINTS } from "../../constants/api-endpoints";
 
 // 서버 컴포넌트용 API 클라이언트 함수들 재내보내기
-export {
-  createServerApiClient,
-  createServerApiWithAuth,
-} from "./server";
+export { createServerApiClient, createServerApiWithAuth } from "./server";

@@ -1,7 +1,10 @@
+import { Route } from "next";
 import { type NextRequest, NextResponse } from "next/server";
 import type { Session } from "next-auth";
 
 import { auth } from "@/auth";
+
+const publicPaths = ["/", "/login", "/signup", "/home"] as Route[];
 
 /**
  * Next-Auth 미들웨어
@@ -13,15 +16,15 @@ interface AuthenticatedRequest extends NextRequest {
 
 const middleware = auth((req: AuthenticatedRequest) => {
   const { pathname } = req.nextUrl;
+
   const isAuthenticated = !!req.auth;
 
   // 공개 경로 정의
-  const publicPaths = ["/", "/login", "/signup"];
-  const isPublicPath = publicPaths.includes(pathname);
+  const isPublicPath = (publicPaths as string[]).includes(pathname);
 
   // 인증이 필요한 경로에 미인증 사용자가 접근하는 경우
   if (!isAuthenticated && !isPublicPath) {
-    const loginUrl = new URL("/login", req.url);
+    const loginUrl = new URL("/home", req.url);
     return NextResponse.redirect(loginUrl);
   }
 

@@ -1,4 +1,4 @@
-import "@triad/ui/globals.css";
+import "./index.css";
 
 import type { Metadata } from "next";
 import localFont from "next/font/local";

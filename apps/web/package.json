@@ -10,13 +10,15 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
     "@triad/ui": "workspace:*",
     "bcryptjs": "^3.0.2",
     "ky": "^1.2.3",
     "motion": "^12.23.22",
     "next": "15.0.3",
     "next-auth": "5.0.0-beta.29",
-    "zod": "^3.22.4"
+    "react-hook-form": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@triad/eslint-config": "workspace:*",

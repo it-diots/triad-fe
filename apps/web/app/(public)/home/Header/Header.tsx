@@ -1,11 +1,17 @@
 "use client";
 
 import { Button } from "@triad/ui";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
+import { useAuth } from "@/hooks/use-auth";
+
 export default function Header() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement | null>(null);
+
+  const { isAuthenticated, logout } = useAuth();
 
   // 열렸을 때 배경 스크롤 잠금
   useEffect(() => {
@@ -21,6 +27,15 @@ export default function Header() {
     if (!drawerRef.current.contains(e.target as Node)) {
       setOpen(false);
     }
+  };
+
+  const handleAuthAction = () => {
+    if (isAuthenticated) {
+      logout();
+      return;
+    }
+
+    router.push("/login");
   };
 
   return (
@@ -50,7 +65,15 @@ export default function Header() {
       </nav>
 
       {/* 데스크톱 CTA */}
-      <div className="hidden md:block">
+      <div className="hidden items-center gap-2 md:flex">
+        <Button
+          size="sm"
+          className="text-xs font-semibold"
+          onClick={handleAuthAction}
+        >
+          Login
+        </Button>
+
         <Button variant="secondary" size="sm" className="text-xs font-semibold">
           Contact Us
         </Button>
@@ -161,7 +184,14 @@ export default function Header() {
         </nav>
 
         {/* 드로어 푸터 CTA */}
-        <div className="mt-auto border-t border-white/10 p-4">
+        <div className="mt-auto flex flex-col gap-2 border-t border-white/10 p-4">
+          <Button
+            className="w-full justify-center text-sm font-semibold"
+            onClick={handleAuthAction}
+          >
+            Login
+          </Button>
+
           <Button
             variant="secondary"
             className="w-full justify-center text-sm font-semibold"

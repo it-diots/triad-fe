@@ -91,8 +91,7 @@ export const TimestampsSchema = z.object({
  */
 export const EmailSchema = z
   .string({
-    required_error: "이메일 주소를 입력해주세요",
-    invalid_type_error: "이메일 주소 형식이 올바르지 않습니다",
+    message: "이메일 주소를 입력해주세요",
   })
   .min(1, "이메일 주소를 입력해주세요")
   .email("올바른 이메일 주소 형식을 입력해주세요 (예: user@example.com)")
@@ -105,8 +104,7 @@ export const EmailSchema = z
  */
 export const PasswordSchema = z
   .string({
-    required_error: "비밀번호를 입력해주세요",
-    invalid_type_error: "비밀번호는 문자열이어야 합니다",
+    message: "비밀번호를 입력해주세요",
   })
   .min(8, "비밀번호는 최소 8자 이상이어야 합니다")
   .max(128, "비밀번호는 128자를 초과할 수 없습니다")
@@ -133,7 +131,7 @@ export const PasswordConfirmSchema = z
  */
 export const UsernameSchema = z
   .string({
-    required_error: "사용자명을 입력해주세요",
+    message: "사용자명을 입력해주세요",
   })
   .min(3, "사용자명은 최소 3자 이상이어야 합니다")
   .max(20, "사용자명은 20자를 초과할 수 없습니다")

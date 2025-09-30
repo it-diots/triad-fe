@@ -146,7 +146,7 @@ export class ApiResponseHandler {
         message: userFriendlyMessage,
         error: {
           code: "VALIDATION_ERROR",
-          details: error.errors,
+          details: error.issues,
         },
       };
 

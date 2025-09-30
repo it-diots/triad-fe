@@ -1,8 +1,9 @@
 /**
  * API 엔드포인트 상수
+ * prefixUrl과 함께 사용하므로 경로는 슬래시 없이 시작합니다
  */
 
-const API_BASE = "/api/v1";
+const API_BASE = "api/v1" as const;
 
 export const API_ENDPOINTS = {
   /**
@@ -19,7 +20,7 @@ export const API_ENDPOINTS = {
     REFRESH: `${API_BASE}/auth/refresh`,
     /** 현재 로그인한 사용자 프로필 조회/수정 (GET/PUT) */
     PROFILE: `${API_BASE}/auth/profile`,
-    /** NextAuth.js 엔드포인트 */
+    /** NextAuth.js 엔드포인트 (절대 경로) */
     NEXT_AUTH: "/api/auth",
   },
 

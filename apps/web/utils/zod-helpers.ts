@@ -58,36 +58,23 @@ function formatSingleIssue(issue: ZodIssue): string {
     lastName: "성",
   };
 
-  const fieldName = path.length > 0 ? fieldMap[path[0]] || path[0] : "입력값";
+  const pathKey = String(path.length > 0 ? path[0] : "");
+  const fieldName = pathKey ? fieldMap[pathKey] || pathKey : "입력값";
 
   // 에러 코드별 커스텀 메시지
+  // Zod 4에서는 message를 우선 사용
   switch (code) {
     case "invalid_type":
-      if (issue.expected === "string" && issue.received === "undefined") {
-        return `${fieldName}을(를) 입력해주세요.`;
-      }
-      return `${fieldName}의 형식이 올바르지 않습니다.`;
+      return message || `${fieldName}의 형식이 올바르지 않습니다.`;
 
     case "too_small":
-      if (issue.type === "string") {
-        return message; // 이미 한국어로 정의된 메시지 사용
-      }
-      return `${fieldName}이(가) 너무 짧습니다.`;
+      return message || `${fieldName}이(가) 너무 짧습니다.`;
 
     case "too_big":
-      if (issue.type === "string") {
-        return message;
-      }
-      return `${fieldName}이(가) 너무 깁니다.`;
+      return message || `${fieldName}이(가) 너무 깁니다.`;
 
-    case "invalid_string":
-      if (issue.validation === "email") {
-        return "올바른 이메일 주소를 입력해주세요.";
-      }
-      if (issue.validation === "regex") {
-        return message; // 이미 한국어로 정의된 메시지 사용
-      }
-      return `${fieldName}의 형식이 올바르지 않습니다.`;
+    case "invalid_format":
+      return message || `${fieldName}의 형식이 올바르지 않습니다.`;
 
     case "custom":
       return message;
