@@ -6,48 +6,6 @@
 import { z } from "zod";
 
 /**
- * 기본 API 응답 스키마
- */
-export const BaseApiResponseSchema = z.object({
-  success: z.boolean(),
-  message: z.string(),
-  timestamp: z.string().datetime().optional(),
-});
-
-/**
- * 페이지네이션 스키마
- */
-export const PaginationSchema = z.object({
-  page: z.number().int().min(1),
-  limit: z.number().int().min(1).max(100),
-  total: z.number().int().min(0),
-  totalPages: z.number().int().min(0),
-});
-
-/**
- * 페이지네이션된 응답 스키마
- */
-export function createPaginatedResponseSchema<T extends z.ZodTypeAny>(
-  dataSchema: T
-) {
-  return BaseApiResponseSchema.extend({
-    data: z.array(dataSchema),
-    pagination: PaginationSchema,
-  });
-}
-
-/**
- * 성공 응답 스키마
- */
-export function createSuccessResponseSchema<T extends z.ZodTypeAny>(
-  dataSchema: T
-) {
-  return BaseApiResponseSchema.extend({
-    data: dataSchema,
-  });
-}
-
-/**
  * 에러 응답 스키마 (실제 API 스펙에 맞게 수정)
  */
 export const ErrorResponseSchema = z.object({
@@ -72,35 +30,30 @@ export const ApiErrorDataSchema = z.object({
 });
 
 /**
- * ID 파라미터 스키마
- */
-export const IdParamSchema = z.object({
-  id: z.string().uuid("유효하지 않은 ID 형식입니다"),
-});
-
-/**
  * 타임스탬프 스키마
  */
 export const TimestampsSchema = z.object({
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+  deletedAt: z.iso.datetime().nullable(),
+  emailVerifiedAt: z.iso.datetime().nullable(),
+  lastLoginAt: z.iso.datetime().nullable(),
 });
 
 /**
- * 더 사용자 친화적인 이메일 스키마
+ * 이메일 스키마
  */
 export const EmailSchema = z
-  .string({
-    message: "이메일 주소를 입력해주세요",
+  .email({
+    message: "올바른 이메일 주소 형식을 입력해주세요 (예: user@example.com)",
   })
   .min(1, "이메일 주소를 입력해주세요")
-  .email("올바른 이메일 주소 형식을 입력해주세요 (예: user@example.com)")
   .max(255, "이메일 주소는 255자를 초과할 수 없습니다")
-  .toLowerCase() // 이메일 정규화
-  .trim(); // 공백 제거
+  .toLowerCase()
+  .trim();
 
 /**
- * 강화된 비밀번호 스키마
+ * 비밀번호 스키마
  */
 export const PasswordSchema = z
   .string({
@@ -112,19 +65,6 @@ export const PasswordSchema = z
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/,
     "비밀번호는 대문자, 소문자, 숫자, 특수문자(@$!%*?&)를 각각 최소 1개씩 포함해야 합니다"
   );
-
-/**
- * 안전한 비밀번호 확인 스키마
- */
-export const PasswordConfirmSchema = z
-  .object({
-    password: PasswordSchema,
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "비밀번호가 일치하지 않습니다",
-    path: ["confirmPassword"], // 에러 위치 지정
-  });
 
 /**
  * 사용자명 스키마
@@ -143,16 +83,5 @@ export const UsernameSchema = z
   .trim();
 
 // 타입 추출
-export type BaseApiResponse = z.infer<typeof BaseApiResponseSchema>;
-export type Pagination = z.infer<typeof PaginationSchema>;
 export type ErrorResponse = z.infer<typeof ErrorResponseSchema>;
 export type ApiErrorData = z.infer<typeof ApiErrorDataSchema>;
-export type IdParam = z.infer<typeof IdParamSchema>;
-
-// 호환성을 위한 추가 타입들
-export type ApiResponse<T = unknown> = {
-  success: boolean;
-  data?: T;
-  error?: string;
-  message?: string;
-};

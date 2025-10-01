@@ -17,18 +17,17 @@ import {
  */
 export const UserSchema = z
   .object({
-    id: z.string().uuid(),
+    id: z.uuid(),
     email: EmailSchema,
     username: z.string(),
     firstName: z.string().nullable(),
     lastName: z.string().nullable(),
-    avatar: z.string().url().nullable(),
+    avatar: z.url().nullable(),
     role: z.enum(["USER", "ADMIN", "MODERATOR"]),
     status: z.enum(["ACTIVE", "INACTIVE", "SUSPENDED", "DELETED"]),
     provider: z.enum(["LOCAL", "GOOGLE", "GITHUB"]),
-    isEmailVerified: z.boolean(),
   })
-  .merge(TimestampsSchema);
+  .extend(TimestampsSchema.shape);
 
 /**
  * JWT 토큰 스키마 (실제 API 응답)
@@ -109,5 +108,3 @@ export type SignupRequest = z.infer<typeof SignupRequestSchema>;
 export type SignupResponse = z.infer<typeof SignupResponseSchema>;
 export type RefreshTokenRequest = z.infer<typeof RefreshTokenRequestSchema>;
 export type RefreshTokenResponse = z.infer<typeof RefreshTokenResponseSchema>;
-
-// 사용자 인증 관련 타입들만 제공

@@ -11,9 +11,7 @@ import {
   LoginResponseSchema,
   RefreshTokenResponseSchema,
 } from "@/schemas/auth";
-import { GetUserProfileResponseSchema } from "@/schemas/users";
 import { API_ENDPOINTS, apiClient } from "@/utils/api-client";
-import { setServerToken } from "@/utils/api-client/auth-adapter";
 
 /**
  * Next-Auth v5 설정
@@ -61,8 +59,8 @@ const nextAuth = NextAuth({
             json: loginData,
           });
 
-          // 응답 데이터 검증 (실제 API 응답 구조)
           const responseData = await response.json();
+
           const validatedResponse = LoginResponseSchema.parse(responseData);
 
           console.log("📊 API 응답 결과:", {
@@ -127,12 +125,32 @@ const nextAuth = NextAuth({
         token.tokenExpiry = Date.now() + user.expiresIn * 1000;
       }
 
-      // 토큰 만료 전 미리 갱신 (5분 여유)
+      // 이미 에러가 있거나 tokenExpiry가 0이면 갱신 시도하지 않음 (무한 루프 방지)
+      if (token.error || token.tokenExpiry === 0) {
+        return token;
+      }
+
+      // refreshToken이 없으면 갱신 불가
+      if (!token.refreshToken) {
+        return token;
+      }
+
+      // 토큰 갱신 조건:
+      // 1. 만료 5분 전
+      // 2. tokenExpiry가 과거인 경우 (백엔드와 불일치)
       const refreshThreshold = 5 * 60 * 1000; // 5분
-      const shouldRefresh =
+
+      const isExpiringSoon =
         token.tokenExpiry &&
         typeof token.tokenExpiry === "number" &&
         Date.now() > token.tokenExpiry - refreshThreshold;
+
+      const isAlreadyExpired =
+        token.tokenExpiry &&
+        typeof token.tokenExpiry === "number" &&
+        Date.now() > token.tokenExpiry;
+
+      const shouldRefresh = isExpiringSoon || isAlreadyExpired;
 
       if (shouldRefresh) {
         console.log("🔄 토큰 갱신 시도 (만료 전 갱신)");
@@ -172,6 +190,9 @@ const nextAuth = NextAuth({
             token.error = TOKEN_ERROR_CODES.REFRESH_TOKEN_ERROR;
           }
 
+          // 무한 루프 방지: tokenExpiry를 0으로 설정하여 더 이상 갱신 시도 안함
+          token.tokenExpiry = 0;
+
           return token; // null 반환 대신 error flag와 함께 토큰 반환
         }
       }
@@ -180,45 +201,16 @@ const nextAuth = NextAuth({
     },
 
     async session({ session, token }) {
-      // 토큰 에러 상태 확인
       if (token?.error) {
         session.error = token.error;
         return session;
       }
 
-      // 세션에 사용자 정보와 토큰 추가
       if (token?.id && typeof token.id === "string") {
         session.user.id = token.id;
 
         if (typeof token.accessToken === "string") {
           session.accessToken = token.accessToken;
-
-          // 외부 API에서 최신 사용자 정보 가져오기
-          try {
-            // 서버 환경에서 토큰 설정
-            setServerToken(token.accessToken);
-            const response = await apiClient.get(API_ENDPOINTS.AUTH.PROFILE);
-
-            const responseData = await response.json();
-            const validatedResponse =
-              GetUserProfileResponseSchema.parse(responseData);
-            const userData = validatedResponse.data;
-
-            if (userData) {
-              session.user = {
-                ...session.user,
-                id: userData.id,
-                email: userData.email,
-                name:
-                  `${userData.firstName || ""} ${userData.lastName || ""}`.trim() ||
-                  userData.username,
-                image: userData.avatar,
-              };
-            }
-          } catch (error) {
-            console.error("세션 업데이트 중 사용자 정보 조회 오류:", error);
-            // 사용자 정보 조회 실패해도 기존 세션 정보는 유지
-          }
         }
       }
 

@@ -14,21 +14,26 @@ export const TOKEN_ERROR_CODES = {
 /**
  * 토큰 에러 타입
  */
-export type TokenErrorCode = (typeof TOKEN_ERROR_CODES)[keyof typeof TOKEN_ERROR_CODES];
+export type TokenErrorCode =
+  (typeof TOKEN_ERROR_CODES)[keyof typeof TOKEN_ERROR_CODES];
 
 /**
  * 토큰 에러 메시지 매핑
  */
 export const TOKEN_ERROR_MESSAGES: Record<TokenErrorCode, string> = {
   [TOKEN_ERROR_CODES.REFRESH_TOKEN_ERROR]: "토큰 갱신 중 오류가 발생했습니다.",
-  [TOKEN_ERROR_CODES.REFRESH_TOKEN_EXPIRED]: "리프레시 토큰이 만료되었습니다. 다시 로그인해 주세요.",
+  [TOKEN_ERROR_CODES.REFRESH_TOKEN_EXPIRED]:
+    "리프레시 토큰이 만료되었습니다. 다시 로그인해 주세요.",
 } as const;
 
 /**
  * 토큰 에러 여부 확인 유틸리티
  */
 export function isTokenError(error: unknown): error is TokenErrorCode {
-  return typeof error === "string" && Object.values(TOKEN_ERROR_CODES).includes(error as TokenErrorCode);
+  return (
+    typeof error === "string" &&
+    Object.values(TOKEN_ERROR_CODES).includes(error as TokenErrorCode)
+  );
 }
 
 /**

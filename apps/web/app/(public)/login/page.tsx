@@ -17,16 +17,14 @@ import {
   Input,
 } from "@triad/ui";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { ZodError } from "zod";
 
+import { useAuth } from "@/hooks/use-auth";
 import { LoginRequest, LoginRequestSchema } from "@/schemas/auth";
-import { API_ENDPOINTS, apiClient } from "@/utils/api-client";
-import { formatZodError } from "@/utils/zod-helpers";
 
 export default function Login() {
-  const router = useRouter();
+  const { login } = useAuth();
+
   const form = useForm<LoginRequest>({
     resolver: zodResolver(LoginRequestSchema),
     defaultValues: {
@@ -36,23 +34,7 @@ export default function Login() {
   });
 
   async function onSubmit(values: LoginRequest) {
-    try {
-      const validatedValues = LoginRequestSchema.parse(values);
-
-      await apiClient.post(API_ENDPOINTS.AUTH.LOGIN, {
-        json: validatedValues,
-      });
-
-      router.push("/");
-    } catch (error) {
-      if (error instanceof ZodError) {
-        const formattedError = formatZodError(error);
-        form.setError("root.message", { message: formattedError });
-        return;
-      }
-
-      throw error;
-    }
+    await login(values);
   }
 
   return (

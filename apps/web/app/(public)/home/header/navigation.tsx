@@ -6,12 +6,27 @@ import { useEffect, useRef, useState } from "react";
 
 import { useAuth } from "@/hooks/use-auth";
 
-export default function Header() {
+interface HeaderProps {
+  initialIsAuthenticated?: boolean;
+}
+
+export default function Navigation({
+  initialIsAuthenticated = false,
+}: HeaderProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement | null>(null);
 
-  const { isAuthenticated, logout } = useAuth();
+  const {
+    isAuthenticated: clientIsAuthenticated,
+    isLoading,
+    logout,
+  } = useAuth();
+
+  // 로딩 중일 때는 서버에서 받은 초기값 사용, 로딩 완료되면 클라이언트 상태 사용
+  const isAuthenticated = isLoading
+    ? initialIsAuthenticated
+    : clientIsAuthenticated;
 
   // 열렸을 때 배경 스크롤 잠금
   useEffect(() => {
@@ -71,7 +86,7 @@ export default function Header() {
           className="text-xs font-semibold"
           onClick={handleAuthAction}
         >
-          Login
+          {isAuthenticated ? "Logout" : "Login"}
         </Button>
 
         <Button variant="secondary" size="sm" className="text-xs font-semibold">
@@ -189,7 +204,7 @@ export default function Header() {
             className="w-full justify-center text-sm font-semibold"
             onClick={handleAuthAction}
           >
-            Login
+            {isAuthenticated ? "Logout" : "Login"}
           </Button>
 
           <Button
