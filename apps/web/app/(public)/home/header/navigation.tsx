@@ -89,9 +89,16 @@ export default function Navigation({
           {isAuthenticated ? "Logout" : "Login"}
         </Button>
 
-        <Button variant="secondary" size="sm" className="text-xs font-semibold">
-          Contact Us
-        </Button>
+        {isAuthenticated && (
+          <Button
+            variant="secondary"
+            size="sm"
+            className="text-xs font-semibold"
+            onClick={() => router.push("/dashboard")}
+          >
+            Dashboard
+          </Button>
+        )}
       </div>
 
       {/* 모바일 햄버거 버튼 */}
@@ -207,13 +214,15 @@ export default function Navigation({
             {isAuthenticated ? "Logout" : "Login"}
           </Button>
 
-          <Button
-            variant="secondary"
-            className="w-full justify-center text-sm font-semibold"
-            onClick={() => setOpen(false)}
-          >
-            Contact Us
-          </Button>
+          {isAuthenticated && (
+            <Button
+              variant="secondary"
+              className="w-full justify-center text-sm font-semibold"
+              onClick={() => router.push("/dashboard")}
+            >
+              Dashboard
+            </Button>
+          )}
         </div>
       </div>
     </header>
