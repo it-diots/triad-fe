@@ -1,29 +1,19 @@
 "use client";
 
-import { Button } from "@triad/ui";
-import { useState } from "react";
+import { Button, Icon } from "@triad/ui";
 
-interface ConnectionActionButtonProps {
-  initialConnected: boolean;
-}
+interface AddProjectButtonProps {}
 
-export function ProjectsActionButton({
-  initialConnected,
-}: ConnectionActionButtonProps) {
-  const [isConnected, setIsConnected] = useState(initialConnected);
-
-  const handleToggle = () => {
-    setIsConnected(!isConnected);
-    console.log(isConnected ? "Disconnected" : "Connected");
+export function AddProjectButton({}: AddProjectButtonProps) {
+  const createProject = () => {
+    // 로직 추가
+    window.alert("프로젝트 추가");
   };
 
   return (
-    <Button
-      variant={isConnected ? "outline" : "default"}
-      size="sm"
-      onClick={handleToggle}
-    >
-      {isConnected ? "Disconnect" : "Connect"}
+    <Button variant="outline" size="sm" onClick={createProject}>
+      <Icon.Plus className="mr-2 h-4 w-4" />
+      프로젝트 추가
     </Button>
   );
 }

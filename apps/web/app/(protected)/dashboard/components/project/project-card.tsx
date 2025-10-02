@@ -2,7 +2,6 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-  Button,
   Card,
   CardContent,
   CardDescription,
@@ -14,6 +13,8 @@ import {
 } from "@triad/ui";
 
 import { formatDate } from "@/utils/date";
+
+import { AddProjectButton } from "./projects-action-button";
 
 const PROJECT_LIST = [
   {
@@ -139,10 +140,7 @@ export default function ProjectCard() {
       <div className="flex items-center justify-between">
         <b className="text-lg font-bold">Projects</b>
 
-        <Button variant="outline" size="sm">
-          <Icon.Plus className="mr-2 h-4 w-4" />
-          프로젝트 추가
-        </Button>
+        <AddProjectButton />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
