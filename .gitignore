@@ -17,6 +17,7 @@ build
 .env.development.local
 .env.test.local
 .env.production.local
+.mcp.json
 
 # IDE and Editor files
 .idea/
@@ -55,7 +56,6 @@ logs
 *.crx
 *.pem
 web-ext-artifacts/
-
 
 # Claude Code
 .claude

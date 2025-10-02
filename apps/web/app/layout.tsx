@@ -1,7 +1,9 @@
-import "@triad/ui/globals.css";
+import "./index.css";
 
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+
+import { AuthProvider } from "@/components/providers/auth-provider";
 
 const pretendard = localFont({
   src: "../public/fonts/PretendardVariable.woff2",
@@ -22,7 +24,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className={`${pretendard.variable}`}>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }
