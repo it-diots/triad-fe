@@ -1,5 +1,30 @@
 {
   "name": "@triad/shared",
   "version": "0.0.1",
-  "private": true
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./lib/query-client": {
+      "types": "./dist/lib/query-client.d.ts",
+      "default": "./dist/lib/query-client.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "setup-dev": "tsc && echo 'Shared package built for development'",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.90.2"
+  },
+  "devDependencies": {
+    "@triad/typescript-config": "workspace:*"
+  }
 }

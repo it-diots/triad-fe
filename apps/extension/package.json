@@ -14,13 +14,13 @@
     "postinstall": "wxt prepare"
   },
   "dependencies": {
-    "@triad/ui": "workspace:*",
-    "@triad/shared": "workspace:*"
+    "@triad/shared": "workspace:*",
+    "@triad/ui": "workspace:*"
   },
   "devDependencies": {
     "@triad/eslint-config": "workspace:*",
-    "@triad/typescript-config": "workspace:*",
     "@triad/tailwindcss-config": "workspace:*",
+    "@triad/typescript-config": "workspace:*",
     "@types/chrome": "^0.0.268",
     "@wxt-dev/module-react": "^1.1.0",
     "wxt": "^0.20.11"

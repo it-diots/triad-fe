@@ -1,8 +1,11 @@
 import { createRoot } from "react-dom/client";
+import { Badge } from "@ui/components/badge";
 import { Button } from "@ui/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/components/card";
-import { Badge } from "@ui/components/badge";
+import { createQueryClient, QueryClientProvider } from "@triad/shared";
 import "@/assets/tailwind.css";
+
+const queryClient = createQueryClient();
 
 function App() {
   return (
@@ -62,5 +65,9 @@ function App() {
 const container = document.getElementById("root");
 if (container) {
   const root = createRoot(container);
-  root.render(<App />);
+  root.render(
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
+  );
 }
