@@ -1,4 +1,5 @@
 import NextAuth from "next-auth";
+import type { JWT } from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
 
 import {
@@ -34,73 +35,49 @@ const nextAuth = NextAuth({
         },
       },
       async authorize(credentials) {
-        console.log("🔍 인증 시작:", {
-          email: credentials?.email,
-          hasPassword: !!credentials?.password,
-        });
-
         // 자격 증명 유효성 검사
         if (!credentials?.email || !credentials?.password) {
-          console.log("❌ 자격 증명 누락");
           return null;
         }
 
         try {
-          // 요청 데이터 검증
+          // 요청 데이터 검증 및 로그인
           const loginData = LoginRequestSchema.parse({
             email: (credentials.email as string).toLowerCase(),
             password: credentials.password as string,
           });
 
-          console.log("✅ 외부 API 서버로 로그인 요청");
-
-          // 외부 API 서버로 로그인 요청
           const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGIN, {
             json: loginData,
           });
 
-          const responseData = await response.json();
-
-          const validatedResponse = LoginResponseSchema.parse(responseData);
-
-          console.log("📊 API 응답 결과:", {
-            hasUser: !!validatedResponse.user,
-            hasTokens: !!validatedResponse.accessToken,
-          });
+          const validatedResponse = LoginResponseSchema.parse(
+            await response.json()
+          );
 
           if (!validatedResponse.user) {
-            console.log("❌ 로그인 실패 또는 사용자 정보 없음");
             return null;
           }
 
-          console.log("✅ 인증 성공");
-
-          // 인증 성공 - 사용자 정보와 토큰 반환
-          const { user } = validatedResponse;
-
+          // 인증 성공 - API User 정보와 토큰 반환
           return {
-            id: user.id,
-            email: user.email,
-            name:
-              `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
-              user.username,
-            image: user.avatar,
+            ...validatedResponse.user,
             accessToken: validatedResponse.accessToken,
             refreshToken: validatedResponse.refreshToken,
             expiresIn: validatedResponse.expiresIn,
           };
         } catch (error: unknown) {
-          console.error("❌ 인증 오류:", error);
-
-          // API 에러 로깅
-          if (isApiError(error)) {
-            console.error("API 에러 상세:", {
-              status: error.status,
-              message: error.data?.message,
-              code: error.data?.error?.code,
-            });
+          // 개발 환경에서만 에러 상세 로깅
+          if (process.env.NODE_ENV === "development") {
+            console.error("❌ 인증 오류:", error);
+            if (isApiError(error)) {
+              console.error("API 에러 상세:", {
+                status: error.status,
+                message: error.data?.message,
+                code: error.data?.error?.code,
+              });
+            }
           }
-
           return null;
         }
       },
@@ -115,85 +92,71 @@ const nextAuth = NextAuth({
 
   // 콜백 함수 설정
   callbacks: {
-    async jwt({ token, user, account }) {
-      // 로그인 시 사용자 정보와 토큰을 JWT에 추가
-      if (user && account) {
-        token.id = user.id;
-        token.accessToken = user.accessToken;
-        token.refreshToken = user.refreshToken;
-        token.expiresIn = user.expiresIn;
-        token.tokenExpiry = Date.now() + user.expiresIn * 1000;
+    async jwt({ token, user, account }): Promise<JWT> {
+      // 초기 로그인 시: user 객체의 모든 정보를 JWT에 저장
+      if (account) {
+        // 토큰 필드를 제외한 사용자 정보 추출
+        const {
+          accessToken: _accessToken,
+          refreshToken: _refreshToken,
+          expiresIn: _expiresIn,
+          ...apiUser
+        } = user;
+
+        return {
+          ...token,
+          accessToken: user.accessToken,
+          refreshToken: user.refreshToken,
+          expiresIn: user.expiresIn,
+          tokenExpiry: Date.now() + user.expiresIn * 1000,
+          userInfo: apiUser,
+        } as JWT;
       }
 
-      // 이미 에러가 있거나 tokenExpiry가 0이면 갱신 시도하지 않음 (무한 루프 방지)
-      if (token.error || token.tokenExpiry === 0) {
+      // 토큰 갱신 로직
+      // 에러가 있거나 refreshToken이 없으면 갱신 불가
+      if (token.error || !token.refreshToken) {
         return token;
       }
 
-      // refreshToken이 없으면 갱신 불가
-      if (!token.refreshToken) {
-        return token;
-      }
-
-      // 토큰 갱신 조건:
-      // 1. 만료 5분 전
-      // 2. tokenExpiry가 과거인 경우 (백엔드와 불일치)
+      // 토큰 만료 체크 (5분 전에 갱신 시도)
       const refreshThreshold = 5 * 60 * 1000; // 5분
-
-      const isExpiringSoon =
+      const shouldRefresh =
         token.tokenExpiry &&
-        typeof token.tokenExpiry === "number" &&
-        Date.now() > token.tokenExpiry - refreshThreshold;
-
-      const isAlreadyExpired =
-        token.tokenExpiry &&
-        typeof token.tokenExpiry === "number" &&
-        Date.now() > token.tokenExpiry;
-
-      const shouldRefresh = isExpiringSoon || isAlreadyExpired;
+        Date.now() > (token.tokenExpiry as number) - refreshThreshold;
 
       if (shouldRefresh) {
-        console.log("🔄 토큰 갱신 시도 (만료 전 갱신)");
-
         try {
           const response = await apiClient.post(API_ENDPOINTS.AUTH.REFRESH, {
             json: { refreshToken: token.refreshToken },
           });
 
-          const responseData = await response.json();
-          const refreshedTokens =
-            RefreshTokenResponseSchema.parse(responseData);
+          const refreshedTokens = RefreshTokenResponseSchema.parse(
+            await response.json()
+          );
 
-          // 새로운 refresh token이 있으면 교체, 없으면 기존 유지
-          const newRefreshToken =
-            refreshedTokens.refreshToken || token.refreshToken;
-
-          token.accessToken = refreshedTokens.accessToken;
-          token.refreshToken = newRefreshToken;
-          token.expiresIn = refreshedTokens.expiresIn;
-          token.tokenExpiry = Date.now() + refreshedTokens.expiresIn * 1000;
-
-          console.log("✅ 토큰 갱신 성공");
+          // 갱신된 토큰으로 업데이트
+          return {
+            ...token,
+            accessToken: refreshedTokens.accessToken,
+            refreshToken: refreshedTokens.refreshToken || token.refreshToken,
+            expiresIn: refreshedTokens.expiresIn,
+            tokenExpiry: Date.now() + refreshedTokens.expiresIn * 1000,
+          } as JWT;
         } catch (error) {
-          console.error("❌ 토큰 갱신 실패:", error);
-
-          // 에러 타입에 따른 차별화된 처리
-          if (isHttpError(error)) {
-            if (error.response?.status === 401) {
-              // refresh token이 만료된 경우 - 재로그인 필요
-              token.error = TOKEN_ERROR_CODES.REFRESH_TOKEN_EXPIRED;
-            } else {
-              // 네트워크 오류 등 - 재시도 가능
-              token.error = TOKEN_ERROR_CODES.REFRESH_TOKEN_ERROR;
-            }
-          } else {
-            token.error = TOKEN_ERROR_CODES.REFRESH_TOKEN_ERROR;
+          // 개발 환경에서만 에러 로깅
+          if (process.env.NODE_ENV === "development") {
+            console.error("❌ 토큰 갱신 실패:", error);
           }
 
-          // 무한 루프 방지: tokenExpiry를 0으로 설정하여 더 이상 갱신 시도 안함
-          token.tokenExpiry = 0;
+          // 에러 타입에 따른 차별화된 처리
+          const errorCode =
+            isHttpError(error) && error.response?.status === 401
+              ? TOKEN_ERROR_CODES.REFRESH_TOKEN_EXPIRED
+              : TOKEN_ERROR_CODES.REFRESH_TOKEN_ERROR;
 
-          return token; // null 반환 대신 error flag와 함께 토큰 반환
+          // 에러 상태로 반환 (재로그인 유도)
+          return { ...token, error: errorCode } as JWT;
         }
       }
 
@@ -201,17 +164,25 @@ const nextAuth = NextAuth({
     },
 
     async session({ session, token }) {
-      if (token?.error) {
+      // 에러 전파
+      if (token.error) {
         session.error = token.error;
-        return session;
       }
 
-      if (token?.id && typeof token.id === "string") {
-        session.user.id = token.id;
+      // accessToken 추가
+      if (token.accessToken) {
+        session.accessToken = token.accessToken;
+      }
 
-        if (typeof token.accessToken === "string") {
-          session.accessToken = token.accessToken;
-        }
+      // User 정보 추가
+      if (token.userInfo) {
+        session.user = {
+          ...token.userInfo,
+          name:
+            `${token.userInfo.firstName || ""} ${token.userInfo.lastName || ""}`.trim() ||
+            token.userInfo.username,
+          image: token.userInfo.avatar,
+        } as typeof session.user;
       }
 
       return session;
