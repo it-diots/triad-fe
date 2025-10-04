@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@triad/shared";
 import {
   Button,
   Form,
@@ -16,11 +17,28 @@ import {
 } from "@triad/ui";
 import { useForm } from "react-hook-form";
 
-import { useCreateProject } from "@/hooks/use-create-project";
-import {
-  type CreateProjectRequest,
-  CreateProjectRequestSchema,
-} from "@/schemas/project";
+import type { CreateProjectRequest, Project } from "@/schemas/project";
+import { CreateProjectRequestSchema, ProjectSchema } from "@/schemas/project";
+import { API_ENDPOINTS, apiClient } from "@/utils/api-client";
+
+function useCreateProject() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["projects", "create"],
+    mutationFn: async (newProject: CreateProjectRequest): Promise<Project> => {
+      const validatedData = CreateProjectRequestSchema.parse(newProject);
+      const response = await apiClient.post(API_ENDPOINTS.PROJECTS.CREATE, {
+        json: validatedData,
+      });
+      const data = await response.json();
+      return ProjectSchema.parse(data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+  });
+}
 
 interface CreateProjectFormProps {
   onSuccess?: () => void;

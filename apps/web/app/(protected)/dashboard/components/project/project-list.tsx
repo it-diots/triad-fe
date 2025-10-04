@@ -1,15 +1,35 @@
 "use client";
 
-import { Input } from "@triad/ui";
+import { useQuery } from "@triad/shared";
+import { Button, Input } from "@triad/ui";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";
 
-import { useProjects } from "@/hooks/use-projects";
+import { getProjects } from "@/lib/api/projects";
 import type { ProjectListResponse } from "@/schemas/project";
 
 import { Pagination } from "./pagination";
 import { ProjectGrid } from "./project-grid";
 import { AddProjectButton } from "./projects-action-button";
+
+function useProjects({
+  page = 1,
+  limit = 20,
+  search = "",
+  initialData,
+}: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  initialData?: ProjectListResponse;
+} = {}) {
+  return useQuery({
+    queryKey: ["projects", { page, limit, search }],
+    queryFn: () => getProjects({ page, limit, search }),
+    initialData,
+    placeholderData: (previousData) => previousData,
+  });
+}
 
 interface ProjectListProps {
   initialData?: ProjectListResponse;
@@ -24,7 +44,7 @@ export function ProjectList({ initialData }: ProjectListProps) {
   const limit = Number(searchParams.get("limit")) || 20;
   const searchQuery = searchParams.get("search") || "";
 
-  // 로컬 검색 입력 상태 (디바운스용)
+  // 로컬 검색 입력 상태
   const [searchInput, setSearchInput] = useState(searchQuery);
 
   // 프로젝트 목록 조회
@@ -53,22 +73,27 @@ export function ProjectList({ initialData }: ProjectListProps) {
     [router, searchParams]
   );
 
-  // 페이지 변경 핸들러
-  const handlePageChange = (newPage: number) => {
-    updateURL({ page: newPage, limit, search: searchQuery });
+  // 검색 적용
+  const handleApplySearch = () => {
+    updateURL({ page: 1, limit, search: searchInput });
   };
 
-  // 검색 핸들러 (디바운스 적용)
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchInput(value);
+  // 검색 초기화
+  const handleResetSearch = () => {
+    setSearchInput("");
+    updateURL({ page: 1, limit, search: "" });
+  };
 
-    // 500ms 디바운스
-    const timer = setTimeout(() => {
-      updateURL({ page: 1, limit, search: value });
-    }, 500);
+  // Enter 키로 검색 적용
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleApplySearch();
+    }
+  };
 
-    return () => clearTimeout(timer);
+  // 페이지 변경 핸들러
+  const handlePageChange = (newPage: number) => {
+    updateURL({ page: newPage });
   };
 
   if (isError) {
@@ -94,9 +119,18 @@ export function ProjectList({ initialData }: ProjectListProps) {
         <Input
           placeholder="프로젝트 검색..."
           value={searchInput}
-          onChange={handleSearchChange}
+          onChange={(e) => setSearchInput(e.target.value)}
+          onKeyDown={handleKeyDown}
           className="max-w-sm"
         />
+        <Button size="sm" onClick={handleApplySearch}>
+          적용
+        </Button>
+        {searchQuery && (
+          <Button size="sm" variant="outline" onClick={handleResetSearch}>
+            초기화
+          </Button>
+        )}
       </div>
 
       {/* 프로젝트 그리드 */}
