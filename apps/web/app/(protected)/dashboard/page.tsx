@@ -2,8 +2,7 @@ import { auth } from "@/auth";
 import { getProjects } from "@/lib/api/projects";
 import { setServerToken } from "@/utils/api-client/auth-adapter";
 
-import { LatestActivityCard, UserInfoCard } from "./components";
-import { ProjectList } from "./components/project/project-list";
+import { LatestActivityCard, ProjectList, UserInfoCard } from "./components";
 
 /**
  * 사용자 대시보드 페이지

@@ -10,7 +10,6 @@ import type { ProjectListResponse } from "@/schemas/project";
 
 import { Pagination } from "./pagination";
 import { ProjectGrid } from "./project-grid";
-import { AddProjectButton } from "./projects-action-button";
 
 function useProjects({
   page = 1,
@@ -33,9 +32,10 @@ function useProjects({
 
 interface ProjectListProps {
   initialData?: ProjectListResponse;
+  actionButton?: React.ReactNode;
 }
 
-export function ProjectList({ initialData }: ProjectListProps) {
+export default function ProjectList({ initialData, actionButton }: ProjectListProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -111,7 +111,7 @@ export function ProjectList({ initialData }: ProjectListProps) {
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <b className="text-lg font-bold">Projects</b>
-        <AddProjectButton />
+        {actionButton}
       </div>
 
       {/* 검색 */}

@@ -3,11 +3,11 @@
 import { Button, Icon } from "@triad/ui";
 import { useState } from "react";
 
-import { CreateProjectModal } from "./create-project-modal";
+import { CreateProjectModal } from "..";
 
 interface AddProjectButtonProps {}
 
-export function AddProjectButton({}: AddProjectButtonProps) {
+export default function AddProjectButton({}: AddProjectButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (

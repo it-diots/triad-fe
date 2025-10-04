@@ -15,7 +15,7 @@ interface CreateProjectModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function CreateProjectModal({
+export default function CreateProjectModal({
   open,
   onOpenChange,
 }: CreateProjectModalProps) {
@@ -33,6 +33,7 @@ export function CreateProjectModal({
             프로젝트 정보를 입력하고 새로운 프로젝트를 생성하세요
           </DialogDescription>
         </DialogHeader>
+
         <CreateProjectForm onSuccess={handleSuccess} />
       </DialogContent>
     </Dialog>
