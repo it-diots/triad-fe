@@ -39,6 +39,22 @@ export const API_ENDPOINTS = {
     /** 특정 사용자 삭제 (DELETE) */
     DELETE: (id: string) => `${API_BASE}/users/${id}`,
   },
+
+  /**
+   * 프로젝트 관리 관련 API 엔드포인트
+   */
+  PROJECTS: {
+    /** 프로젝트 목록 조회 (GET) */
+    LIST: `${API_BASE}/projects`,
+    /** 새 프로젝트 생성 (POST) */
+    CREATE: `${API_BASE}/projects`,
+    /** 특정 프로젝트 조회 (GET) */
+    BY_ID: (id: string) => `${API_BASE}/projects/${id}`,
+    /** 특정 프로젝트 정보 수정 (PUT/PATCH) */
+    UPDATE: (id: string) => `${API_BASE}/projects/${id}`,
+    /** 특정 프로젝트 삭제 (DELETE) */
+    DELETE: (id: string) => `${API_BASE}/projects/${id}`,
+  },
 } as const;
 
 /**

@@ -1,9 +1,8 @@
 "use client";
 
+import { QueryProvider } from "@triad/shared";
 import type { Session } from "next-auth";
 import type { ReactNode } from "react";
-
-import { QueryProvider } from "@triad/shared";
 
 import { AuthProvider } from "./auth-provider";
 
