@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import { CreateProjectModal } from "./create-project-modal";
 
-export default function CreateProject() {
+export function CreateProject() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (

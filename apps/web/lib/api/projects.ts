@@ -49,6 +49,7 @@ export async function getProjects(
 
   // 응답 데이터 검증
   const data = await response.json();
+
   return ProjectListResponseSchema.parse(data);
 }
 

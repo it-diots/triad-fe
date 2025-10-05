@@ -163,13 +163,10 @@ export const GetProjectsParamsSchema = z
  * 프로젝트 목록 응답 스키마
  */
 export const ProjectListResponseSchema = z.object({
-  data: z.array(ProjectWithOwnerSchema),
-  meta: z.object({
-    page: z.number().int(),
-    limit: z.number().int(),
-    total: z.number().int(),
-    totalPages: z.number().int(),
-  }),
+  projects: z.array(ProjectWithOwnerSchema),
+  total: z.number().int(),
+  page: z.number().int(),
+  limit: z.number().int(),
 });
 
 // 타입 추출
