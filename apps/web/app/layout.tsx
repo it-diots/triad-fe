@@ -3,7 +3,7 @@ import "./index.css";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 
-import { AuthProvider } from "@/components/providers/auth-provider";
+import { AppProvider } from "@/components/providers/app-provider";
 
 const pretendard = localFont({
   src: "../public/fonts/PretendardVariable.woff2",
@@ -25,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="ko" className={`${pretendard.variable} bg-zinc-950`}>
       <body className="antialiased">
-        <AuthProvider>{children}</AuthProvider>
+        <AppProvider>{children}</AppProvider>
       </body>
     </html>
   );
