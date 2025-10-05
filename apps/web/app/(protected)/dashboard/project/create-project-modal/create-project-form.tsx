@@ -50,7 +50,7 @@ interface CreateProjectFormProps {
   onSuccess?: () => void;
 }
 
-export default function CreateProjectForm({
+export function CreateProjectForm({
   onSuccess,
 }: CreateProjectFormProps) {
   const { mutate, isPending } = useCreateProject();

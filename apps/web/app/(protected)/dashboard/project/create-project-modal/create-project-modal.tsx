@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@triad/ui";
 
-import CreateProjectForm from "./create-project-form";
+import { CreateProjectForm } from "./create-project-form";
 
 /**
  * 프로젝트 생성 모달 컴포넌트
@@ -23,7 +23,7 @@ interface CreateProjectModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export default function CreateProjectModal({
+export function CreateProjectModal({
   open,
   onOpenChange,
 }: CreateProjectModalProps) {
