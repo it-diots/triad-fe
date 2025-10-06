@@ -35,7 +35,7 @@ export default async function DashboardPage({
     const initialProjectsData = await getProjects({ page, limit });
 
     return (
-      <div className="grid h-full grid-cols-[1fr_400px] grid-rows-[1fr_auto] gap-4">
+      <div className="grid h-screen grid-cols-[1fr_400px] grid-rows-[1fr_auto] gap-4">
         <div className="grid grid-cols-[300px_1fr] gap-4">
           <UserInfoCard session={session} />
           <ProjectList initialData={initialProjectsData} />

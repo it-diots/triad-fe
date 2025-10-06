@@ -12,7 +12,7 @@ import {
   Separator,
 } from "@triad/ui";
 
-import type { Project, ProjectWithOwner } from "@/schemas/project";
+import type { ProjectWithOwner } from "@/schemas/project";
 import { formatDate } from "@/utils/date";
 
 import { DeleteProjectButton } from "./delete-project-button";
@@ -31,7 +31,7 @@ interface ProjectDetailViewProps {
 
 export function ProjectDetailView({ project }: ProjectDetailViewProps) {
   return (
-    <div className="container mx-auto max-w-4xl py-8">
+    <div className="container mx-auto h-screen max-w-4xl py-8">
       <Card>
         <CardHeader>
           <div className="flex items-start justify-between">
