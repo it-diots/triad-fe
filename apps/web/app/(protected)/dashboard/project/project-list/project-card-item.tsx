@@ -11,6 +11,7 @@ import {
   Icon,
   Separator,
 } from "@triad/ui";
+import Link from "next/link";
 
 import type { ProjectWithOwner } from "@/schemas/project";
 import { formatDate } from "@/utils/date";
@@ -32,12 +33,8 @@ export function ProjectCardItem({
   project,
   isDeleted = false,
 }: ProjectCardItemProps) {
-  return (
-    <Card
-      className={cn("relative cursor-pointer gap-4 p-0", {
-        "cursor-not-allowed": isDeleted,
-      })}
-    >
+  const cardContent = (
+    <>
       <CardHeader className="flex flex-col gap-4 p-4 pb-0">
         <CardTitle className="flex flex-col gap-2">
           <div className="flex items-center gap-1">
@@ -124,6 +121,22 @@ export function ProjectCardItem({
             </span>
           </div>
         </>
+      )}
+    </>
+  );
+
+  return (
+    <Card
+      className={cn("relative cursor-pointer gap-4 p-0", {
+        "cursor-not-allowed": isDeleted,
+      })}
+    >
+      {isDeleted ? (
+        cardContent
+      ) : (
+        <Link href={`/projects/${project.id}`} className="block">
+          {cardContent}
+        </Link>
       )}
     </Card>
   );

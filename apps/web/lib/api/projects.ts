@@ -8,12 +8,14 @@ import type {
   GetProjectsParams,
   Project,
   ProjectListResponse,
+  ProjectWithOwner,
 } from "@/schemas/project";
 import {
   CreateProjectRequestSchema,
   GetProjectsParamsSchema,
   ProjectListResponseSchema,
   ProjectSchema,
+  ProjectWithOwnerSchema,
 } from "@/schemas/project";
 import { API_ENDPOINTS, apiClient } from "@/utils/api-client";
 
@@ -51,6 +53,34 @@ export async function getProjects(
   const data = await response.json();
 
   return ProjectListResponseSchema.parse(data);
+}
+
+/**
+ * 프로젝트 상세 조회 API 함수
+ * 특정 프로젝트의 상세 정보를 조회합니다
+ *
+ * @param id - 조회할 프로젝트 ID
+ * @returns 프로젝트 상세 정보
+ *
+ * @example
+ * ```typescript
+ * // 서버 컴포넌트에서 직접 호출
+ * const project = await getProjectById('project-id');
+ *
+ * // 클라이언트 컴포넌트 (TanStack Query와 함께)
+ * const { data } = useQuery({
+ *   queryKey: ['projects', id],
+ *   queryFn: () => getProjectById(id)
+ * });
+ * ```
+ */
+export async function getProjectById(id: string): Promise<ProjectWithOwner> {
+  // API 호출
+  const response = await apiClient.get(API_ENDPOINTS.PROJECTS.BY_ID(id));
+
+  // 응답 데이터 검증
+  const data = await response.json();
+  return ProjectWithOwnerSchema.parse(data);
 }
 
 /**
@@ -95,4 +125,30 @@ export async function createProject(
   // 응답 데이터 검증
   const data = await response.json();
   return ProjectSchema.parse(data);
+}
+
+/**
+ * 프로젝트 삭제 API 함수
+ * 특정 프로젝트를 삭제합니다 (소프트 삭제)
+ *
+ * @param id - 삭제할 프로젝트 ID
+ * @returns void
+ *
+ * @example
+ * ```typescript
+ * // 클라이언트 컴포넌트 (TanStack Query와 함께)
+ * const { mutate } = useMutation({
+ *   mutationFn: deleteProject,
+ *   onSuccess: () => {
+ *     queryClient.invalidateQueries({ queryKey: ['projects'] });
+ *     router.push('/dashboard');
+ *   }
+ * });
+ *
+ * mutate('project-id');
+ * ```
+ */
+export async function deleteProject(id: string): Promise<void> {
+  // API 호출
+  await apiClient.delete(API_ENDPOINTS.PROJECTS.DELETE(id));
 }
