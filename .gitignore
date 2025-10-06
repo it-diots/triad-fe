@@ -56,7 +56,3 @@ logs
 *.crx
 *.pem
 web-ext-artifacts/
-
-# Claude Code
-.claude
-CLAUDE.md
