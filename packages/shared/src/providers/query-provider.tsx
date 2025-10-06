@@ -44,7 +44,7 @@ export function QueryProvider({ children }: QueryProviderProps) {
             gcTime: 10 * 60 * 1000,
             // 실패 시 1번 재시도
             retry: 1,
-            // 윈도우 포커스 시 자동으로 데이터 재요청
+            // 윈도우 포커스 시 자동으로 데이터 재요청 하지 않음
             refetchOnWindowFocus: false,
           },
           mutations: {
