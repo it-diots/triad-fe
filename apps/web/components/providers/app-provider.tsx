@@ -1,10 +1,10 @@
 "use client";
 
-import { QueryProvider } from "@triad/shared";
 import type { Session } from "next-auth";
 import type { ReactNode } from "react";
 
 import { AuthProvider } from "./auth-provider";
+import { QueryProvider } from "./query-provider";
 
 /**
  * 앱 전체 프로바이더 통합 컴포넌트

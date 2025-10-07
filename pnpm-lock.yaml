@@ -94,6 +94,12 @@ importers:
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.2.2(react-hook-form@7.63.0(react@19.1.1))
+      '@tanstack/react-query':
+        specifier: ^5.62.11
+        version: 5.90.2(react@19.1.1)
+      '@tanstack/react-query-devtools':
+        specifier: ^5.62.11
+        version: 5.90.2(@tanstack/react-query@5.90.2(react@19.1.1))(react@19.1.1)
       '@triad/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -178,13 +184,6 @@ importers:
         version: 8.42.0(eslint@8.57.1)(typescript@5.9.2)
 
   packages/shared:
-    dependencies:
-      '@tanstack/react-query':
-        specifier: ^5.62.11
-        version: 5.90.2(react@19.1.1)
-      '@tanstack/react-query-devtools':
-        specifier: ^5.62.11
-        version: 5.90.2(@tanstack/react-query@5.90.2(react@19.1.1))(react@19.1.1)
     devDependencies:
       '@triad/typescript-config':
         specifier: workspace:*
