@@ -100,9 +100,6 @@ importers:
       '@tanstack/react-query-devtools':
         specifier: ^5.62.11
         version: 5.90.2(@tanstack/react-query@5.90.2(react@19.1.1))(react@19.1.1)
-      '@triad/shared':
-        specifier: workspace:*
-        version: link:../../packages/shared
       '@triad/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -183,23 +180,7 @@ importers:
         specifier: ^8.41.0
         version: 8.42.0(eslint@8.57.1)(typescript@5.9.2)
 
-  packages/shared:
-    devDependencies:
-      '@triad/typescript-config':
-        specifier: workspace:*
-        version: link:../typescript-config
-      '@types/react':
-        specifier: ^19.0.12
-        version: 19.1.12
-      '@types/react-dom':
-        specifier: ^19.0.4
-        version: 19.1.9(@types/react@19.1.12)
-      react:
-        specifier: ^19.0.0
-        version: 19.1.1
-      typescript:
-        specifier: ^5.7.3
-        version: 5.9.2
+  packages/shared: {}
 
   packages/tailwindcss-config:
     devDependencies:

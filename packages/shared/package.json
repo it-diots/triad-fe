@@ -1,13 +1,5 @@
 {
   "name": "@triad/shared",
   "version": "0.0.1",
-  "private": true,
-  "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
-    "setup-dev": "tsc"
-  },
-  "devDependencies": {
-    "@triad/typescript-config": "workspace:*"
-  }
+  "private": true
 }
