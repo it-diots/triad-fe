@@ -6,10 +6,11 @@ import localFont from "next/font/local";
 import { AppProvider } from "@/components/providers/app-provider";
 
 const pretendard = localFont({
-  src: "../public/fonts/PretendardVariable.woff2",
+  src: "../public/fonts/PretendardVariable-subset.woff2",
   display: "swap",
   weight: "400 900",
   variable: "--font-pretendard",
+  preload: true,
 });
 
 export const metadata: Metadata = {
