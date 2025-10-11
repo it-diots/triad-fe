@@ -8,7 +8,7 @@ import { ProjectDetailView } from "./project-detail-view";
 
 /**
  * 프로젝트 상세 페이지 (서버 컴포넌트)
- * 동적 라우트로 프로젝트 ID를 받아 상세 정보를 조회합니다
+ * 동적 라우트로 프로젝트 ID를 받아 초기 데이터를 조회하여 클라이언트 컴포넌트에 전달합니다
  *
  * @param params.projectId - URL 경로의 프로젝트 ID
  */
@@ -34,10 +34,12 @@ export default async function ProjectDetailPage({
   setServerToken(session.accessToken);
 
   try {
-    // 프로젝트 상세 정보 조회
-    const project = await getProjectById(projectId);
+    // 프로젝트 상세 정보 조회 (초기 데이터)
+    const initialProject = await getProjectById(projectId);
 
-    return <ProjectDetailView project={project} />;
+    return (
+      <ProjectDetailView projectId={projectId} initialData={initialProject} />
+    );
   } catch (error) {
     console.error("프로젝트 조회 실패:", error);
     // 404 페이지 표시
