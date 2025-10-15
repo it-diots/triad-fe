@@ -29,6 +29,7 @@ import {
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
+import { queryKeys } from "@/constants/query-keys";
 import { getProjectById, updateProject } from "@/lib/api/projects";
 import type { ProjectWithOwner, UpdateProjectRequest } from "@/schemas/project";
 import { UpdateProjectRequestSchema } from "@/schemas/project";
@@ -59,7 +60,7 @@ export function ProjectDetailView({
 
   // 프로젝트 데이터 조회 (초기 데이터 사용)
   const { data: project } = useQuery({
-    queryKey: ["projects", projectId],
+    queryKey: queryKeys.projects.detail(projectId),
     queryFn: () => getProjectById(projectId),
     initialData,
   });
@@ -88,8 +89,10 @@ export function ProjectDetailView({
     mutationFn: (data: UpdateProjectRequest) => updateProject(projectId, data),
     onSuccess: () => {
       // 상세 페이지와 목록 데이터 동시 갱신
-      queryClient.invalidateQueries({ queryKey: ["projects", projectId] });
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.projects.detail(projectId),
+      });
+      queryClient.invalidateQueries({ queryKey: queryKeys.projects.lists() });
       setIsEditing(false); // 읽기 전용 모드로 전환
     },
     onError: (error: Error) => {
