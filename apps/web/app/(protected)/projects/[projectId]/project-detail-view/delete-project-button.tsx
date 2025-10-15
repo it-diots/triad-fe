@@ -17,6 +17,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { queryKeys } from "@/constants/query-keys";
 import { deleteProject } from "@/lib/api/projects";
 
 /**
@@ -46,7 +47,7 @@ export function DeleteProjectButton({
     mutationFn: () => deleteProject(projectId),
     onSuccess: () => {
       // 프로젝트 목록 쿼리 무효화 (대시보드 자동 갱신)
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.projects.lists() });
 
       // 대시보드로 리디렉션
       router.push("/dashboard");

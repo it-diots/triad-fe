@@ -9,6 +9,7 @@ import type {
   Project,
   ProjectListResponse,
   ProjectWithOwner,
+  UpdateProjectRequest,
 } from "@/schemas/project";
 import {
   CreateProjectRequestSchema,
@@ -16,6 +17,7 @@ import {
   ProjectListResponseSchema,
   ProjectSchema,
   ProjectWithOwnerSchema,
+  UpdateProjectRequestSchema,
 } from "@/schemas/project";
 import { API_ENDPOINTS, apiClient } from "@/utils/api-client";
 
@@ -119,6 +121,55 @@ export async function createProject(
 
   // API 호출
   const response = await apiClient.post(API_ENDPOINTS.PROJECTS.CREATE, {
+    json: validatedData,
+  });
+
+  // 응답 데이터 검증
+  const data = await response.json();
+  return ProjectSchema.parse(data);
+}
+
+/**
+ * 프로젝트 수정 API 함수
+ * 특정 프로젝트의 정보를 수정합니다
+ *
+ * @param id - 수정할 프로젝트 ID
+ * @param updateData - 수정할 프로젝트 정보
+ * @returns 수정된 프로젝트 데이터
+ *
+ * @example
+ * ```typescript
+ * // 클라이언트 컴포넌트 (TanStack Query와 함께)
+ * const { mutate } = useMutation({
+ *   mutationFn: (data: UpdateProjectRequest) => updateProject(projectId, data),
+ *   onSuccess: () => {
+ *     queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
+ *     queryClient.invalidateQueries({ queryKey: ['projects'] });
+ *   }
+ * });
+ *
+ * mutate({
+ *   name: '수정된 프로젝트',
+ *   domain: 'example.com',
+ *   isPublic: true,
+ *   settings: {
+ *     allowComments: true,
+ *     allowGuests: false,
+ *     maxParticipants: 10,
+ *     isPublic: true
+ *   }
+ * });
+ * ```
+ */
+export async function updateProject(
+  id: string,
+  updateData: UpdateProjectRequest
+): Promise<Project> {
+  // 요청 데이터 검증
+  const validatedData = UpdateProjectRequestSchema.parse(updateData);
+
+  // API 호출
+  const response = await apiClient.patch(API_ENDPOINTS.PROJECTS.UPDATE(id), {
     json: validatedData,
   });
 
