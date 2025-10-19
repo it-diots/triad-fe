@@ -144,6 +144,70 @@ export const CreateProjectRequestSchema = z.object({
 });
 
 /**
+ * 프로젝트 수정 요청 스키마
+ */
+export const UpdateProjectRequestSchema = z.object({
+  /** 프로젝트 이름 (필수) */
+  name: z
+    .string({
+      message: "프로젝트 이름을 입력해주세요",
+    })
+    .min(1, "프로젝트 이름을 입력해주세요")
+    .max(100, "프로젝트 이름은 100자를 초과할 수 없습니다")
+    .trim(),
+
+  /** 프로젝트 설명 (선택) */
+  description: z
+    .string()
+    .trim()
+    .transform((val) => (val === "" ? null : val))
+    .pipe(
+      z
+        .string()
+        .max(500, "프로젝트 설명은 500자를 초과할 수 없습니다")
+        .nullable()
+    )
+    .nullable()
+    .optional(),
+
+  /** 프로젝트 URL (선택) */
+  url: z
+    .string()
+    .trim()
+    .transform((val) => (val === "" ? null : val))
+    .pipe(
+      z
+        .string()
+        .url("유효한 URL을 입력해주세요")
+        .max(2048, "URL은 2048자를 초과할 수 없습니다")
+        .nullable()
+    )
+    .nullable()
+    .optional(),
+
+  /** 도메인 (필수) */
+  domain: z
+    .string({
+      message: "도메인을 입력해주세요",
+    })
+    .min(1, "도메인을 입력해주세요")
+    .max(255, "도메인은 255자를 초과할 수 없습니다")
+    .regex(
+      /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i,
+      "유효한 도메인을 입력해주세요 (예: example.com)"
+    )
+    .trim(),
+
+  /** 프로젝트 공개 여부 (필수) */
+  isPublic: z.boolean({
+    message: "프로젝트 공개 여부를 선택해주세요",
+  }),
+
+  /** 프로젝트 설정 (필수) */
+  settings: CreateProjectSettingsSchema,
+});
+
+/**
  * 프로젝트 목록 조회 요청 파라미터 스키마
  */
 export const GetProjectsParamsSchema = z
@@ -176,5 +240,6 @@ export type ProjectOwner = z.infer<typeof ProjectOwnerSchema>;
 export type Project = z.infer<typeof ProjectSchema>;
 export type ProjectWithOwner = z.infer<typeof ProjectWithOwnerSchema>;
 export type CreateProjectRequest = z.infer<typeof CreateProjectRequestSchema>;
+export type UpdateProjectRequest = z.infer<typeof UpdateProjectRequestSchema>;
 export type GetProjectsParams = z.infer<typeof GetProjectsParamsSchema>;
 export type ProjectListResponse = z.infer<typeof ProjectListResponseSchema>;

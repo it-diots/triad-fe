@@ -4,6 +4,7 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Route } from "next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
+import { queryKeys } from "@/constants/query-keys";
 import { getProjects } from "@/lib/api/projects";
 import type { ProjectListResponse } from "@/schemas/project";
 
@@ -32,7 +33,7 @@ export function ProjectList({ initialData }: ProjectListProps) {
 
   // TanStack Query로 프로젝트 목록 조회
   const { data, isLoading, isPlaceholderData } = useQuery({
-    queryKey: ["projects", { page: currentPage, limit }],
+    queryKey: queryKeys.projects.list({ page: currentPage, limit }),
     queryFn: () => getProjects({ page: currentPage, limit }),
     initialData,
     placeholderData: keepPreviousData,

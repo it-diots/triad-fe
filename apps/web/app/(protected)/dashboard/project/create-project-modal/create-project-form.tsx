@@ -17,6 +17,7 @@ import {
 } from "@triad/ui";
 import { useForm } from "react-hook-form";
 
+import { queryKeys } from "@/constants/query-keys";
 import { createProject } from "@/lib/api/projects";
 import type { CreateProjectRequest } from "@/schemas/project";
 import { CreateProjectRequestSchema } from "@/schemas/project";
@@ -33,7 +34,7 @@ function useCreateProject() {
     mutationFn: createProject,
     onSuccess: () => {
       // 프로젝트 목록 쿼리 무효화 (자동 재조회)
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.projects.lists() });
     },
   });
 }
@@ -50,9 +51,7 @@ interface CreateProjectFormProps {
   onSuccess?: () => void;
 }
 
-export function CreateProjectForm({
-  onSuccess,
-}: CreateProjectFormProps) {
+export function CreateProjectForm({ onSuccess }: CreateProjectFormProps) {
   const { mutate, isPending } = useCreateProject();
 
   // React Hook Form 초기화
