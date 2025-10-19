@@ -15,12 +15,16 @@ import {
   FormLabel,
   FormMessage,
   Input,
+  Separator,
 } from "@triad/ui";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 
 import { useAuth } from "@/hooks/use-auth";
 import { LoginRequest, LoginRequestSchema } from "@/schemas/auth";
+
+import IconGoogle from "./icon-google";
 
 export default function Login() {
   const { login } = useAuth();
@@ -98,6 +102,19 @@ export default function Login() {
               </div>
             </form>
           </Form>
+
+          <Separator className="my-4" />
+
+          <Button
+            type="button"
+            className="flex w-full items-center gap-2"
+            variant="secondary"
+            onClick={() => signIn("google")}
+          >
+            <IconGoogle />
+            Login with Google
+          </Button>
+
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{" "}
             <Link href="/signup" className="underline">
